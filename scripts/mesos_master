@@ -1,0 +1,1 @@
+/mesos-0.28.1/build/bin/mesos-master.sh --ip=0.0.0.0 --work_dir=/var/lib/mesos
