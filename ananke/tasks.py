@@ -44,7 +44,7 @@ class MesosSlave:
     def is_running(self):
         return self.running
         
-    def start(ip):
+    def start(self,ip):
         if self.running:
             return {'okay': False, 'error':"A Meos slave is already running."}
         if not got_cluster(ip):
