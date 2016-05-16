@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <link rel="shortcut icon" href="/static/favicon.ico">
+        <link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+        <script src = "/static/js/jquery.js"></script>
+        <script src = "/static/js/jquery-ui.min.js"></script>
+        <script src = "/static/js/angular_min.js"></script>
+        <script src = "/static/js/angular-spinners.min.js"></script>
+        <script src = "/static/js/ananke.js"></script>
+                
+        <title>Ananke: There is no cloud, only other people's computers.</title>
+    </head>
+
+    <body ng-app='ananke-main'>
+    
+        <aside style="float:left; width:300px">
+            <div>
+                <img src='/static/img/ananke.png' />
+            </div>
+            <div>
+                <img src='/static/img/Ananke_by_Platone.jpg' />
+            </div>
+            <div ng-controller='docController'>
+                Documentation for installed Python modules at the <a href="https://pypi.python.org/" target="new">Python Package Index</a>
+                or <a href="http://localhost:9000" target="new">local pydoc server</a>:
+                <ul ng-repeat="doc in allthedocs">
+                    <li>
+                        {{doc.name}}: <a ng-href="{{doc.pypi}}" target="new" >pypi</a>
+                        <a ng-href="{{doc.local}}" target="new">local</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+          
+        <section style="height:317px;">
+        
+        </section>
+        
+        <section ng-controller='nodeController'>
+            <spinner name="wait" img-src="/static/img/spinner.gif" register="true"></spinner>
+            <div ng-switch on="status">
+                <div ng-switch-when="dormant"><div ng-include src="'static/templates/dormant.html'"></div></div>
+                <div ng-switch-when="waiting"><div ng-include src="'static/templates/waiting.html'"></div></div>
+                <div ng-switch-when="master"><div ng-include src="'static/templates/master.html'"></div></div>
+                <div ng-switch-default><div ng-include src="'static/templates/dormant.html'"></div></div>
+                
+            </div>
+            
+        </section>
+        
+    </body>
+</html>
+
+
+
+
+

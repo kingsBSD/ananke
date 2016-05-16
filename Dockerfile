@@ -82,9 +82,19 @@ RUN pip3 install scikit-learn
 RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
 
-ADD scripts /
+RUN pip3 install flask
+RUN pip3 install requests
 
-ENV SPARK_HOME = /spark-1.6.1-bin-hadoop2.6
+ADD scripts /usr/local/bin
+ADD ananke /ananke
+
+#ENV SPARK_HOME = /spark-1.6.1-bin-hadoop2.6
+
+#Failed to load native Mesos library from /usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+#/mesos-0.28.1/build/bin/mesos-slave.sh --master=172.17.0.2:5050 --launcher=posix
+#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
+
+# sudo docker run -ti --name jupyter --net=host -p 8888:8888 -p 5050:5050 ananke /bin/bash
 
 CMD ["/bin/bash", "-c", "./spark_jupyter_standalone"]
 

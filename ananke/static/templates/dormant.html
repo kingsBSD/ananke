@@ -1,0 +1,11 @@
+<form>
+    <button ng-click="start_cluster()">Start a cluster.</button>
+    <button>Join a cluster at: </button>
+    <span ng-repeat="chunk in ipchunks">
+        <input size="3" ng-model='chunk.i'>.
+    </span>
+    <span>
+        <input size="3" ng-model='chunk3'>.
+        <input size="3" ng-model='chunk4'>
+    </span>
+</form>
