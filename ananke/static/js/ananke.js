@@ -1,7 +1,10 @@
 var mainModule = angular.module('ananke-main',['angularSpinners']);
             
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
-                
+    
+    $scope.chunk3 = {};
+    $scope.chunk4 = {};
+    
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
@@ -23,7 +26,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.join_cluster = function() {
         //$scope.status = 'waiting';
         //spinnerService.show('wait');
-        var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3, $scope.chunk4]).join('.');
+        var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
         $http.get('api/joincluster',{params: {'ip':masterip}}).success(function(data, status, headers, config) {
             $scope.status = 'slave';
         }).error(function(data, status, headers, config) {});
