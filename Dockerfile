@@ -82,6 +82,11 @@ RUN pip3 install scikit-learn
 RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev
+
+RUN pip3 install twisted
+RUN pip3 install autobahn
+RUN pip3 install PyZMQ
 RUN pip3 install flask
 RUN pip3 install requests
 

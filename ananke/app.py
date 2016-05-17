@@ -1,14 +1,27 @@
 import json
+from multiprocessing import Process
+
+import time
 
 from flask import Flask, request
 
+import zmq
+
+import settings
+import msg
+
 from docgetter import get_docs
 from ipgetter import get_ip
-from tasks import MesosMaster, MesosSlave, SingleNode
+from tasks import MesosMaster, MesosSlave, SingleNode, SocketServer
 
 master = MesosMaster()
 slave = MesosSlave()
 snode = SingleNode()
+sserver = SocketServer()
+
+    
+zcontext = zmq.Context()
+zsocket = zcontext.socket(zmq.PUB)
 
 app = Flask(__name__)
 
@@ -45,6 +58,8 @@ def status():
 @app.route('/api/startcluster')
 def start_master():
     result = master.start()
+    if result['okay']:
+        zsocket.send(bytes("ananke "+msg.WAITMASTER,encoding="UTF-8"))
     return json.dumps(result)
 
 @app.route('/api/joincluster')
@@ -60,9 +75,24 @@ def start_slave():
     else:
         result = {'okay':False, 'error':'Invalid IP address.'}
     return json.dumps(result)
+
+@app.route('/api/ping')
+def ping():
+    zsocket.send(bytes("ananke hello",encoding="UTF-8"))
+    return json.dumps({'ping':'pong'})
     
 if __name__ == '__main__':
-    app.run(debug=True)
+
+    sserver.start()
+
+    zsocket.bind("ipc:///tmp/sock")
+    
+
+    #while True:
+    #    zsocket.send(bytes("ananke hello",encoding="UTF-8"))
+    #    time.sleep(2)
+    
+    app.run(debug=False)
     
     
     #python3 '-c' 'import pydoc; pydoc.browse(port=9000,open_browser=False)'

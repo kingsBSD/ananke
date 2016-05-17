@@ -1,6 +1,18 @@
 var mainModule = angular.module('ananke-main',['angularSpinners']);
             
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
+
+    var msg = {'master_active':0}
+    
+    var auto_conn = new WebSocket("ws://127.0.0.1:5001");
+    auto_conn.onopen = function () {
+    };
+    
+    auto_conn.onmessage = function(e) {
+        switch (parseInt(msg[e.data])) {
+            case 0: $scope.status = 'master'; spinnerService.hide('wait'); break;
+        }    
+    }    
     
     $scope.chunk3 = {};
     $scope.chunk4 = {};
