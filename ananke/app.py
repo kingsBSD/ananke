@@ -45,8 +45,6 @@ def status():
 @app.route('/api/startcluster')
 def start_master():
     result = master.start()
-    if result['okay']:
-        slave.start(result['ip'])
     return json.dumps(result)
 
 @app.route('/api/joincluster')

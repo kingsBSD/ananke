@@ -4,6 +4,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     
     $scope.chunk3 = {};
     $scope.chunk4 = {};
+    $scope.error = {};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -16,19 +17,27 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     });
                     
     $scope.start_cluster = function() {
-        //$scope.status = 'waiting';
-        //spinnerService.show('wait');
+        $scope.status = 'waiting';
+        spinnerService.show('wait');
         $http.get('api/startcluster',{params: {}}).success(function(data, status, headers, config) {
-            $scope.status = 'master';
+            if (!data.okay) {
+                $scope.error.msg = data.error;
+                $scope.status = 'dormant';
+                spinnerService.hide('wait');    
+            }    
         }).error(function(data, status, headers, config) {});
     };
     
     $scope.join_cluster = function() {
-        //$scope.status = 'waiting';
-        //spinnerService.show('wait');
+        $scope.status = 'waiting';
+        spinnerService.show('wait');
         var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
         $http.get('api/joincluster',{params: {'ip':masterip}}).success(function(data, status, headers, config) {
-            $scope.status = 'slave';
+            if (!data.okay) {
+                $scope.error.msg = data.error;
+                $scope.status = 'dormant';
+                spinnerService.hide('wait');    
+            } 
         }).error(function(data, status, headers, config) {});
     };
     
