@@ -1,5 +1,4 @@
 
-import requests
 
 from os import stat 
 import subprocess
@@ -8,11 +7,7 @@ from concurrent.futures import ThreadPoolExecutor as Pool
 from ipgetter import get_ip
 import settings
 
-def got_cluster(ip):
-    try:
-        return requests.get("http://"+ip+":5050",timeout=2).status_code == 200
-    except:
-        return False
+from servicegetters import got_cluster
 
 #http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
 
