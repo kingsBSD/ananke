@@ -17,6 +17,10 @@ class NotificationProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))
 
+    def connectionLost(self, reason):
+        WebSocketServerProtocol.connectionLost(self, reason)
+        self.factory.unregister(self)  
+
     def onMessage(self, payload, isBinary):
         ## echo back message verbatim
         print(payload)
@@ -26,25 +30,31 @@ class NotificationServerFactory(WebSocketServerFactory):
     
     def __init__(self,zsub,host='127.0.0.1',port=settings.WEBSOCKET_PORT):
         WebSocketServerFactory.__init__(self,"ws://"+host+":"+str(port))
-        self.client = False
+        self.clients = []
         self.subscriber = zsub
         self.subscriber.gotMessage = self.recv
         
         
     def register(self,c):
-        self.client = c
-        
+        self.clients.append(c)
+    
+    def unregister(self, client):
+        for c in self.clients:
+            print("unregistered client {}".format(c.peer))
+            self.clients.remove(c)
+    
+          
     def broadcast(self,msg):
-        if self.client:
-            self.client.sendMessage(str(msg).encode('utf8'))
+        for c in self.clients:
+            c.sendMessage(str(msg).encode('utf8'))
         
     def recv(self,*args):
         
-        job = str(args[0].decode("utf-8").split()[1])
+        job = str(args[0].decode("utf-8")).split()[1:]
         
         print(job)
         
-        if job == msg.WAITMASTER:
+        if job[0] == msg.WAITMASTER:
             reactor.callInThread(self.wait_master)      
         
     def wait_master(self):

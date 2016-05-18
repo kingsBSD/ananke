@@ -29,7 +29,7 @@ class Task(object):
         try:
             assert (stat(com).st_mode & 2**6) > 0
         except:
-            print ("Not executable!")
+            print (com+" is not executable!")
             return False
         try:
             print(' '.join([com,args]))
@@ -37,7 +37,7 @@ class Task(object):
             self.running = True
             return True
         except:
-            print ("Terminated")
+            print (come+" terminated!")
             return False
 
     def is_running(self):
