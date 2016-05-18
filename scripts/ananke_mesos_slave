@@ -1,4 +1,4 @@
 #/bin/bash
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-/mesos-0.28.1/build/bin/mesos-slave.sh --master=$1:5050 --launcher=posix
+/mesos-0.28.1/build/bin/mesos-slave.sh --master=$1:5050 --launcher=posix --advertise_ip=$2 --advertise_port=$3
 

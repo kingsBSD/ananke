@@ -5,9 +5,8 @@ from os import stat
 import subprocess
 from concurrent.futures import ThreadPoolExecutor as Pool
 
-
-
 from ipgetter import get_ip
+import settings
 
 def got_cluster(ip):
     try:
@@ -26,18 +25,18 @@ class Task(object):
         self.running = False    
 
     def run(self,com, args):
+        argstr = ' '.join(args)
         try:
             assert (stat(com).st_mode & 2**6) > 0
         except:
             print (com+" is not executable!")
             return False
         try:
-            print(' '.join([com,args]))
-            self.proc = self.pool.submit(subprocess.call, ' '.join([com,args]), shell=True)
+            self.proc = self.pool.submit(subprocess.call, ' '.join([com,argstr]), shell=True)
             self.running = True
             return True
         except:
-            print (come+" terminated!")
+            print (com+" terminated!")
             return False
 
     def is_running(self):
@@ -49,7 +48,7 @@ class SocketServer(Task):
         Task.__init__(self)    
 
     def start(self):
-        Task.run(self,"/usr/bin/python3","socket_server.py")
+        Task.run(self,"/usr/bin/python3",["socket_server.py"])
 
 class MesosMaster(Task):
     
@@ -63,7 +62,7 @@ class MesosMaster(Task):
             return {'okay': False, 'error':"No active network connection was found."}
         if self.running or got_cluster(self.ip):
             return {'okay': False, 'error':"A Meos master is already running."}
-        if Task.run(self,"/usr/local/bin/ananke_mesos_master",self.ip):
+        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[self.ip]):
             return {'okay': True, 'ip':self.ip}    
         else:
             return {'okay':False, 'error':"Can't start a master."}
@@ -78,7 +77,7 @@ class MesosSlave(Task):
             return {'okay': False, 'error':"A Meos slave is already running."}
         if not got_cluster(ip):
             return {'okay': False, 'error':"Can't find the Meos master."}
-        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",ip):
+        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[ip,get_ip(),str(settings.MESOS_ADVERT_PORT)]):
             return {'okay':True, 'ip':ip}
         else:
             return {'okay':False, 'error':"Can't start a slave."}
