@@ -59,7 +59,7 @@ def status():
 def start_master():
     result = master.start()
     if result['okay']:
-        zsocket.send(bytes(" ".join(["ananke"+msg.WAITMASTER,result['ip']]),encoding="UTF-8"))
+        zsocket.send(bytes(" ".join(["ananke",msg.WAITMASTER,result['ip']]),encoding="UTF-8"))
     return json.dumps(result)
 
 @app.route('/api/joincluster')

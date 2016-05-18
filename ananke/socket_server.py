@@ -6,8 +6,16 @@ import settings
 
 from twisted.python import log
 from twisted.internet import reactor, protocol
+from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqSubConnection
+
+from tasks import got_cluster
+
+def sleep(delay):
+    d = Deferred()
+    reactor.callLater(delay, d.callback, None)
+    return d
 
 class NotificationProtocol(WebSocketServerProtocol):
 
@@ -48,6 +56,9 @@ class NotificationServerFactory(WebSocketServerFactory):
         for c in self.clients:
             c.sendMessage(str(msg).encode('utf8'))
         
+# https://github.com/crossbario/autobahn-python/tree/master/examples/twisted/websocket/slowsquare        
+        
+    @inlineCallbacks    
     def recv(self,*args):
         
         job = str(args[0].decode("utf-8")).split()[1:]
@@ -55,13 +66,28 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(job)
         
         if job[0] == msg.WAITMASTER:
-            reactor.callInThread(self.wait_master)      
-        
-    def wait_master(self):
-        self.broadcast("master_active")
-        
-      
-
+            res = yield self.wait_master(job[1])
+            self.broadcast(res)
+    
+    @inlineCallbacks    
+    def wait_master(self,ip):
+        tries = 0
+        master_active = 0
+        while tries < 50:
+            print("Waiting for the Mesos master...")
+            if got_cluster(ip):
+                master_active = True
+                break;
+            tries += 1
+            yield sleep(1)
+            
+        if master_active:
+            print("Found Mesos master.")
+            returnValue("master_active")
+        else:
+            print("Mesos master failed to launch.")
+            returnValue("master_failed")
+            
 if __name__ == '__main__':
 
     import sys

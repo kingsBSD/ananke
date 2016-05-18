@@ -10,7 +10,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     
     auto_conn.onmessage = function(e) {
         switch (parseInt(msg[e.data])) {
-            case 0: $scope.status = 'master'; spinnerService.hide('wait'); break;
+            case msg.master_active: $scope.status = 'master'; spinnerService.hide('wait'); $scope.$apply(); break;
         }    
     }    
     

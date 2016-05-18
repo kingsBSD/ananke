@@ -84,9 +84,13 @@ RUN jupyter notebook --generate-config
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev
 
+# https://github.com/Kronuz/pyScss/issues/308
+ENV LC_CTYPE C.UTF-8
+
 RUN pip3 install twisted
 RUN pip3 install autobahn
 RUN pip3 install PyZMQ
+RUN pip3 install txZMQ
 RUN pip3 install flask
 RUN pip3 install requests
 
