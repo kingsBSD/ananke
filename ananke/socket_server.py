@@ -10,7 +10,7 @@ from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqSubConnection
 
-from tasks import got_cluster
+from servicegetters import got_cluster, got_slave
 
 def sleep(delay):
     d = Deferred()
@@ -68,6 +68,10 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job[0] == msg.WAITMASTER:
             res = yield self.wait_master(job[1])
             self.broadcast(res)
+            
+        if job[0] == msg.WAITSLAVE:
+            res = yield self.wait_slave(job[1])
+            self.broadcast(res)       
     
     @inlineCallbacks    
     def wait_master(self,ip):
@@ -77,7 +81,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             print("Waiting for the Mesos master...")
             if got_cluster(ip):
                 master_active = True
-                break;
+                break
             tries += 1
             yield sleep(1)
             
@@ -87,6 +91,26 @@ class NotificationServerFactory(WebSocketServerFactory):
         else:
             print("Mesos master failed to launch.")
             returnValue("master_failed")
+
+    @inlineCallbacks    
+    def wait_slave(self,ip):
+        tries = 0
+        slave_id = False
+        while tries < 50:
+            print("Waiting for the Mesos slave...")
+            slave_id = got_slave(ip)
+            if slave_id:
+                break
+            tries += 1
+            yield sleep(1)
+            
+        if slave_id:
+            print("Found Mesos slave.")
+            returnValue(" ".join(["slave_active",slave_id]))
+        else:
+            print("Mesos slave failed to launch.")
+            returnValue("slave_failed")            
+        
             
 if __name__ == '__main__':
 

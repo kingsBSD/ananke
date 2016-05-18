@@ -2,15 +2,17 @@ var mainModule = angular.module('ananke-main',['angularSpinners']);
             
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
 
-    var msg = {'master_active':0}
+    var msg = {'master_active':0, 'slave_active':1};
     
     var auto_conn = new WebSocket("ws://127.0.0.1:5001");
     auto_conn.onopen = function () {
     };
     
     auto_conn.onmessage = function(e) {
-        switch (parseInt(msg[e.data])) {
+        var msChunks = e.data.split(" ")
+        switch (parseInt(msg[msChunks[0]])) {
             case msg.master_active: $scope.status = 'master'; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.slave_active: $scope.status = 'slave'; $scope.slave_id = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;          
         }    
     }    
     
@@ -45,6 +47,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         spinnerService.show('wait');
         var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
         $http.get('api/joincluster',{params: {'ip':masterip}}).success(function(data, status, headers, config) {
+            $scope.master_url = masterip+":5050";
             if (!data.okay) {
                 $scope.error.msg = data.error;
                 $scope.status = 'dormant';

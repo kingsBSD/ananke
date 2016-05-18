@@ -1,1 +1,2 @@
 WAITMASTER = "waitmaster"
+WAITSLAVE = "waitslave"
