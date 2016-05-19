@@ -12,14 +12,14 @@ import msg
 
 from docgetter import get_docs
 from ipgetter import get_ip
-from tasks import MesosMaster, MesosSlave, SingleNode, SocketServer
+from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook, SocketServer 
 
 master = MesosMaster()
 slave = MesosSlave()
+cnotebook = ClusterNoteBook()
 snode = SingleNode()
 sserver = SocketServer()
 
-    
 zcontext = zmq.Context()
 zsocket = zcontext.socket(zmq.PUB)
 
@@ -28,7 +28,6 @@ app = Flask(__name__)
 def zocket_zend(*args):
     zsocket.send(bytes(" ".join(["ananke"]+list(args)),encoding="UTF-8"))
     
-
 @app.route('/')
 def root():
     return app.send_static_file('index.html')
@@ -79,6 +78,12 @@ def start_slave():
         zocket_zend(msg.WAITSLAVE,get_ip())
     else:
         result = {'okay':False, 'error':'Invalid IP address.'}
+    return json.dumps(result)
+
+@app.route('/api/startclusternotebook')
+def start_cluster_notebook():
+    ip = request.args.get('ip', False)
+    result = cnotebook.start(ip)
     return json.dumps(result)
 
 @app.route('/api/ping')

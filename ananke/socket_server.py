@@ -66,10 +66,10 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(job)
         
         if job[0] == msg.WAITMASTER:
-            res = yield self.are_we_there_yet(job[1],got_cluster,lambda x: "master_active","master_failed","Mesos master")
+            res = yield self.are_we_there_yet(job[1],got_cluster,lambda x,mip: " ".join(["master_active",mip]),"master_failed","Mesos master")
             
         if job[0] == msg.WAITSLAVE:
-            res = yield self.are_we_there_yet(job[1],got_slave,lambda sid: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
+            res = yield self.are_we_there_yet(job[1],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
             
         self.broadcast(res)       
 
@@ -95,7 +95,7 @@ class NotificationServerFactory(WebSocketServerFactory):
     
         if res:
             print(debug_done)
-            returnValue(on_success(res))
+            returnValue(on_success(res,param))
         else:
             print(debug_fail)
             returnValue(failure)

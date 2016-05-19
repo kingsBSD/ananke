@@ -11,7 +11,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     auto_conn.onmessage = function(e) {
         var msChunks = e.data.split(" ")
         switch (parseInt(msg[msChunks[0]])) {
-            case msg.master_active: $scope.status = 'master'; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.master_active: $scope.status = 'master'; $scope.master_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.slave_active: $scope.status = 'slave'; $scope.slave_id = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;          
         }    
     }    
@@ -46,6 +46,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         $scope.status = 'waiting';
         spinnerService.show('wait');
         var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
+        $scope.master_ip = master_ip
         $http.get('api/joincluster',{params: {'ip':masterip}}).success(function(data, status, headers, config) {
             $scope.master_url = masterip+":5050";
             if (!data.okay) {
@@ -56,6 +57,17 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         }).error(function(data, status, headers, config) {});
     };
     
+    $scope.notebook_cluster = function() {
+        $scope.status = 'waiting';
+        spinnerService.show('wait');
+        $http.get('api/startclusternotebook',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
+            if (!data.okay) {
+                $scope.error.msg = data.error;
+                $scope.status = 'dormant';
+                spinnerService.hide('wait');     
+            }
+        }).error(function(data, status, headers, config) {});
+    };
         
 });
 
