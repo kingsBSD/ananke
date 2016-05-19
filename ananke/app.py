@@ -21,13 +21,15 @@ snode = SingleNode()
 sserver = SocketServer()
 
     
-zcontext = zmq.Context()
-zsocket = zcontext.socket(zmq.PUB)
+
 
 app = Flask(__name__)
 
-def zocket_zend(*args):
-    zsocket.send(bytes(" ".join(["ananke"]+list(args)),encoding="UTF-8"))
+def zocket_send(**kwargs):
+    zcontext = zmq.Context()
+    socket = zcontext.socket(zmq.PUSH)
+    socket.bind("ipc:///tmp/sock")
+    socket.send_json(kwargs)
     
 
 @app.route('/')
@@ -64,7 +66,7 @@ def status():
 def start_master():
     result = master.start()
     if result['okay']:
-        zsocket.send(bytes(" ".join(["ananke",msg.WAITMASTER,result['ip']]),encoding="UTF-8"))
+        zocket_send(msg=msg.WAITMASTER,ip=result['ip'])
     return json.dumps(result)
 
 @app.route('/api/joincluster')
@@ -77,7 +79,7 @@ def start_slave():
         valid = False
     if valid:
         result = slave.start(ip)
-        zocket_zend(msg.WAITSLAVE,get_ip())
+        zocket_send(msg=msg.WAITSLAVE,ip=get_ip())
     else:
         result = {'okay':False, 'error':'Invalid IP address.'}
     return json.dumps(result)
@@ -87,19 +89,19 @@ def start_cluster_notebook():
     ip = request.args.get('ip', False)
     result = cnotebook.start(ip)
     if result['okay']:
-        zocket_zend(msg.WAITNOTEBOOK)
+        zocket_send(msg=msg.WAITNOTEBOOK)
     return json.dumps(result)
 
 @app.route('/api/ping')
 def ping():
-    zsocket.send(bytes("ananke hello",encoding="UTF-8"))
+    zocket_send(ping="pong")
     return json.dumps({'ping':'pong'})
     
 if __name__ == '__main__':
 
     #sserver.start()
 
-    zsocket.bind("ipc:///tmp/sock")
+    
     
 
     #while True:

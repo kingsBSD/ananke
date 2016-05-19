@@ -21,7 +21,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.$apply();
                 break;
             case msg.notebook_active:
-                $scope.status = 'notebook'; $scope.$apply(); break;
+                $scope.status = 'notebook'; spinnerService.hide('wait'); $scope.$apply(); break;
         }    
     }    
     

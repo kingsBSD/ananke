@@ -1,3 +1,6 @@
+
+import json
+
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
@@ -9,7 +12,7 @@ from twisted.python import log
 from twisted.internet import reactor, protocol
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
-from txzmq import ZmqEndpoint, ZmqFactory, ZmqSubConnection
+from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 
 from servicegetters import got_cluster, got_slave, got_notebook
 
@@ -37,11 +40,11 @@ class NotificationProtocol(WebSocketServerProtocol):
 
 class NotificationServerFactory(WebSocketServerFactory):
     
-    def __init__(self,zsub,host='127.0.0.1',port=settings.WEBSOCKET_PORT):
+    def __init__(self,zpull,host='127.0.0.1',port=settings.WEBSOCKET_PORT):
         WebSocketServerFactory.__init__(self,"ws://"+host+":"+str(port))
         self.clients = []
-        self.subscriber = zsub
-        self.subscriber.gotMessage = self.recv
+        self.subscriber = zpull
+        self.subscriber.onPull = self.recv
         
         
     def register(self,c):
@@ -62,22 +65,24 @@ class NotificationServerFactory(WebSocketServerFactory):
         
     @inlineCallbacks    
     def recv(self,*args):
+                
+        message = json.loads(str(args[0][0].decode("utf-8")))
         
-        job = str(args[0].decode("utf-8")).split()[1:]
+        print(message)
         
-        print(job)
+        job = message.get('msg',False)
         
-        if job[0] == msg.WAITMASTER:
-            res, okay = yield self.are_we_there_yet(job[1],got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
+        if job == msg.WAITMASTER:
+            res, okay = yield self.are_we_there_yet(message['ip'],got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
             if okay:
                 yield self.launch_slave(job[1])
                 self.broadcast(res)     
             
-        if job[0] == msg.WAITSLAVE:
-            res, okay = yield self.are_we_there_yet(job[1],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
+        if job == msg.WAITSLAVE:
+            res, okay = yield self.are_we_there_yet(message['ip'],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
             self.broadcast(res) 
         
-        if job[0] == msg.WAITNOTEBOOK:
+        if job == msg.WAITNOTEBOOK:
             res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
             self.broadcast(res)       
 
@@ -125,15 +130,15 @@ if __name__ == '__main__':
     #endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
 
-    sub = ZmqSubConnection(zf, endpoint)
-    sub.subscribe(b'ananke')
+    pull = ZmqPullConnection(zf, endpoint)
+    #sub.subscribe(b'ananke')
 
     def doPrint(*args):
         print("message received: %r" % (args, ))
 
     log.startLogging(sys.stdout)
 
-    ws_factory = NotificationServerFactory(sub)
+    ws_factory = NotificationServerFactory(pull)
     ws_factory.protocol = NotificationProtocol
 
     reactor.listenTCP(settings.WEBSOCKET_PORT, ws_factory)
