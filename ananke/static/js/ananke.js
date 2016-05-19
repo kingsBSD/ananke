@@ -11,8 +11,14 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     auto_conn.onmessage = function(e) {
         var msChunks = e.data.split(" ")
         switch (parseInt(msg[msChunks[0]])) {
-            case msg.master_active: $scope.status = 'master'; $scope.master_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.slave_active: $scope.status = 'slave'; $scope.slave_id = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;          
+            case msg.master_active:
+                $scope.status = 'master'; $scope.master_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.slave_active:
+                $scope.slave_id = msChunks[1]; spinnerService.hide('wait');
+                if ($scope.status == 'waiting') {
+                    $scope.status = 'slave';
+                }    
+                $scope.$apply(); break;          
         }    
     }    
     

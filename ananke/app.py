@@ -20,6 +20,7 @@ cnotebook = ClusterNoteBook()
 snode = SingleNode()
 sserver = SocketServer()
 
+    
 zcontext = zmq.Context()
 zsocket = zcontext.socket(zmq.PUB)
 
@@ -28,6 +29,7 @@ app = Flask(__name__)
 def zocket_zend(*args):
     zsocket.send(bytes(" ".join(["ananke"]+list(args)),encoding="UTF-8"))
     
+
 @app.route('/')
 def root():
     return app.send_static_file('index.html')

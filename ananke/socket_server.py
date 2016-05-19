@@ -4,6 +4,7 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 import msg
 import settings
 
+import requests
 from twisted.python import log
 from twisted.internet import reactor, protocol
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
@@ -66,12 +67,16 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(job)
         
         if job[0] == msg.WAITMASTER:
-            res = yield self.are_we_there_yet(job[1],got_cluster,lambda x,mip: " ".join(["master_active",mip]),"master_failed","Mesos master")
+            res = yield self.are_we_there_yet(job[1],got_cluster,self.master_okay,"master_failed","Mesos master")
             
         if job[0] == msg.WAITSLAVE:
             res = yield self.are_we_there_yet(job[1],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
             
         self.broadcast(res)       
+
+    def master_okay(self,x,ip):
+        requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
+        return " ".join(["master_active",ip])
 
     @inlineCallbacks
     def are_we_there_yet(self,param,tester,on_success,failure,wait_for=False,max_tries=50):
