@@ -86,6 +86,8 @@ def start_slave():
 def start_cluster_notebook():
     ip = request.args.get('ip', False)
     result = cnotebook.start(ip)
+    if result['okay']:
+        zocket_zend(msg.WAITNOTEBOOK)
     return json.dumps(result)
 
 @app.route('/api/ping')
@@ -95,7 +97,7 @@ def ping():
     
 if __name__ == '__main__':
 
-    sserver.start()
+    #sserver.start()
 
     zsocket.bind("ipc:///tmp/sock")
     
@@ -104,7 +106,7 @@ if __name__ == '__main__':
     #    zsocket.send(bytes("ananke hello",encoding="UTF-8"))
     #    time.sleep(2)
     
-    app.run(debug=False)
+    app.run(debug=True)
     
     
     #python3 '-c' 'import pydoc; pydoc.browse(port=9000,open_browser=False)'

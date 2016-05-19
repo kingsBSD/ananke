@@ -11,7 +11,7 @@ from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqSubConnection
 
-from servicegetters import got_cluster, got_slave
+from servicegetters import got_cluster, got_slave, got_notebook
 
 def sleep(delay):
     d = Deferred()
@@ -54,6 +54,7 @@ class NotificationServerFactory(WebSocketServerFactory):
     
           
     def broadcast(self,msg):
+        print("Sending: "+msg)
         for c in self.clients:
             c.sendMessage(str(msg).encode('utf8'))
         
@@ -67,12 +68,21 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(job)
         
         if job[0] == msg.WAITMASTER:
-            res = yield self.are_we_there_yet(job[1],got_cluster,self.master_okay,"master_failed","Mesos master")
+            res, okay = yield self.are_we_there_yet(job[1],got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
+            if okay:
+                yield self.launch_slave(job[1])
+                self.broadcast(res)     
             
         if job[0] == msg.WAITSLAVE:
-            res = yield self.are_we_there_yet(job[1],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
-            
-        self.broadcast(res)       
+            res, okay = yield self.are_we_there_yet(job[1],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
+            self.broadcast(res) 
+        
+        if job[0] == msg.WAITNOTEBOOK:
+            res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
+            self.broadcast(res)       
+
+    def launch_slave(self,ip):
+        requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
 
     def master_okay(self,x,ip):
         requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
@@ -100,10 +110,10 @@ class NotificationServerFactory(WebSocketServerFactory):
     
         if res:
             print(debug_done)
-            returnValue(on_success(res,param))
+            returnValue((on_success(res,param),True))
         else:
             print(debug_fail)
-            returnValue(failure)
+            returnValue((failure,False))
     
                      
 if __name__ == '__main__':
@@ -112,6 +122,7 @@ if __name__ == '__main__':
 
 
     zf = ZmqFactory()
+    #endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
 
     sub = ZmqSubConnection(zf, endpoint)

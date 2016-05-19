@@ -2,7 +2,7 @@ var mainModule = angular.module('ananke-main',['angularSpinners']);
             
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
 
-    var msg = {'master_active':0, 'slave_active':1};
+    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2};
     
     var auto_conn = new WebSocket("ws://127.0.0.1:5001");
     auto_conn.onopen = function () {
@@ -18,7 +18,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 if ($scope.status == 'waiting') {
                     $scope.status = 'slave';
                 }    
-                $scope.$apply(); break;          
+                $scope.$apply();
+                break;
+            case msg.notebook_active:
+                $scope.status = 'notebook'; $scope.$apply(); break;
         }    
     }    
     
