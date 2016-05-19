@@ -76,7 +76,7 @@ def start_slave():
         valid = False
     if valid:
         result = slave.start(ip)
-        zocket_send(msg=msg.WAITSLAVE,ip=get_ip())
+        zocket_send(msg=msg.WAITSLAVE,ip=ip)
     else:
         result = {'okay':False, 'error':'Invalid IP address.'}
     return json.dumps(result)
