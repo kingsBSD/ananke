@@ -12,6 +12,7 @@ import msg
 
 from docgetter import get_docs
 from ipgetter import get_ip
+from servicegetters import got_cluster, got_slave, got_notebook
 from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook, SocketServer 
 
 master = MesosMaster()
@@ -44,22 +45,18 @@ def all_the_docs():
 def status():
     result = {}
     
-    if master.is_running():
-        result['status'] = 'master'
-    else:
-        if slave.is_running():
-            result['status'] = 'slave'
-        else:
-            if snode.is_running():
-                result['status'] = 'single'
-            else:
-                result['status'] = 'dormant'
     ip = get_ip()
     if ip:
         result['network'] = True
         result['ip'] = ip.split('.')
-    else:
-        result['network'] = False
+        result['slave_id'] = got_slave(ip)
+        result['master_owner'] = got_cluster(ip)
+        result['pysparknotebook'] = got_notebook()
+        if result['master_owner'] or result['slave_id']:
+            result['status'] = 'active'
+        else:
+            result['status'] = 'dormant'
+            
     return json.dumps(result)
     
 @app.route('/api/startcluster')

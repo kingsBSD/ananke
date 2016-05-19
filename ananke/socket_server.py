@@ -75,7 +75,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.WAITMASTER:
             res, okay = yield self.are_we_there_yet(message['ip'],got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
             if okay:
-                yield self.launch_slave(job[1])
+                yield self.launch_slave(message['ip'])
                 self.broadcast(res)     
             
         if job == msg.WAITSLAVE:

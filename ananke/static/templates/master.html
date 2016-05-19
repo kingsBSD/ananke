@@ -1,6 +1,10 @@
 <div>
-<p>You started a Mesos master at <a ng-href="http://{{master_url}}" target="new">{{master_url}}</a>.</p>
-<p>Give your friends its IP address and ask them to join it.</p>
-<div ng-include src="'static/templates/gotcluster.html'"></div>
+    <p>You started a Mesos master at <a ng-href="http://{{master_url}}" target="new">{{master_url}}</a>.</p>
+    <p>(Give your friends its IP address and ask them to join it.)</p>
+    <p ng-if="!slave_id">A Mesos slave should start shortly...</p>
+    <p ng-if="slave_id">The id of your Mesos slave is: <a ng-href="http://{{master_url}}/#/slaves/{{slave_id}}" target="new">{{slave_id}}</a>.</p>
 </div>
+
+
+
 
