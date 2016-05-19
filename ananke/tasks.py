@@ -17,6 +17,7 @@ class Task(object):
     def __init__(self):
         self.pool = Pool(max_workers=1)
         self.proc = False
+        self.started = False
         self.running = False    
 
     def run(self,com, args):
@@ -28,7 +29,7 @@ class Task(object):
             return False
         try:
             self.proc = self.pool.submit(subprocess.call, ' '.join([com,argstr]), shell=True)
-            self.running = True
+            self.started = True
             return True
         except:
             print (com+" terminated!")
@@ -52,6 +53,8 @@ class MesosMaster(Task):
         self.ip = False
 
     def start(self):
+        if self.started:
+            return {'okay': False, 'error':"A Meos master was already started."}
         self.ip = get_ip()
         if not self.ip:
             return {'okay': False, 'error':"No active network connection was found."}
@@ -68,6 +71,8 @@ class MesosSlave(Task):
         Task.__init__(self)
         
     def start(self,ip):
+        if self.started:
+            return {'okay': False, 'error':"A Meos slave was already started."}
         if self.running:
             return {'okay': False, 'error':"A Meos slave is already running."}
         if not got_cluster(ip):

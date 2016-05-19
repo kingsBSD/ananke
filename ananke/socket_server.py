@@ -66,52 +66,41 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(job)
         
         if job[0] == msg.WAITMASTER:
-            res = yield self.wait_master(job[1])
-            self.broadcast(res)
+            res = yield self.are_we_there_yet(job[1],got_cluster,lambda x: "master_active","master_failed","Mesos master")
             
         if job[0] == msg.WAITSLAVE:
-            res = yield self.wait_slave(job[1])
-            self.broadcast(res)       
-    
-    @inlineCallbacks    
-    def wait_master(self,ip):
-        tries = 0
-        master_active = 0
-        while tries < 50:
-            print("Waiting for the Mesos master...")
-            if got_cluster(ip):
-                master_active = True
-                break
-            tries += 1
-            yield sleep(1)
+            res = yield self.are_we_there_yet(job[1],got_slave,lambda sid: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
             
-        if master_active:
-            print("Found Mesos master.")
-            returnValue("master_active")
-        else:
-            print("Mesos master failed to launch.")
-            returnValue("master_failed")
+        self.broadcast(res)       
 
-    @inlineCallbacks    
-    def wait_slave(self,ip):
+    @inlineCallbacks
+    def are_we_there_yet(self,param,tester,on_success,failure,wait_for=False,max_tries=50):
         tries = 0
-        slave_id = False
-        while tries < 50:
-            print("Waiting for the Mesos slave...")
-            slave_id = got_slave(ip)
-            if slave_id:
+        res = False
+        if wait_for:
+            debug_str = "Waiting for " + wait_for + "..."
+            debug_done = "Found " + wait_for
+            debug_fail = "Can't find " + wait_for
+        else:
+            debug_str = "Waiting..."
+            debug_done = "Found."
+            debug_fail = "Not found."
+        while tries < max_tries:
+            print(debug_str)
+            res = tester(param)
+            if res:
                 break
             tries += 1
             yield sleep(1)
-            
-        if slave_id:
-            print("Found Mesos slave.")
-            returnValue(" ".join(["slave_active",slave_id]))
+    
+        if res:
+            print(debug_done)
+            returnValue(on_success(res))
         else:
-            print("Mesos slave failed to launch.")
-            returnValue("slave_failed")            
-        
-            
+            print(debug_fail)
+            returnValue(failure)
+    
+                     
 if __name__ == '__main__':
 
     import sys
@@ -126,17 +115,10 @@ if __name__ == '__main__':
     def doPrint(*args):
         print("message received: %r" % (args, ))
 
-    #sub.gotMessage = doPrint
-
-
     log.startLogging(sys.stdout)
 
     ws_factory = NotificationServerFactory(sub)
     ws_factory.protocol = NotificationProtocol
-
-
-
-
 
     reactor.listenTCP(settings.WEBSOCKET_PORT, ws_factory)
     reactor.run()
