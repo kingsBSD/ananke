@@ -48,7 +48,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.subscriber.onPull = self.recv
         
         self.master = tasks.MesosMaster()
-        
+        self.slave = tasks.MesosSlave()
         
     def register(self,c):
         self.clients.append(c)
@@ -77,31 +77,43 @@ class NotificationServerFactory(WebSocketServerFactory):
 
         if job == msg.STARTMASTER:
             if self.master.start(message['ip']):
-                res, okay = yield self.start_master(message['ip'])
+                res, master_okay = yield self.wait_master(message['ip'])
                 self.broadcast(res)
-                if okay:
+                if master_okay:
                     self.master.confirm_started()
-                #    #yield self.launch_slave(message['ip'])
-                #    self.broadcast(res)
+                    slave_okay = yield self.start_slave(message['ip'],message['ip'])
             else:    
-                self.broadcast('start_master_failed')    
-            
-        if job == msg.WAITSLAVE:
-            res, okay = yield self.are_we_there_yet(message['ip'],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
-            self.broadcast(res) 
-        
+                self.broadcast('start_master_failed')
+                
+        if job == msg.STARTSLAVE:
+            okay = yield self.start_slave(msg['master_ip'], msg['slave_ip'])
+            if not okay:
+                self.broadcast('start_slave_failed')
+                                    
         if job == msg.WAITNOTEBOOK:
             res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
             self.broadcast(res)       
 
-    def launch_slave(self,ip):
-        requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
-
     @inlineCallbacks  
-    def start_master(self,ip):
+    def wait_master(self,ip):
         res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
         returnValue((res,okay))
 
+    @inlineCallbacks 
+    def start_slave(self,master_ip,slave_ip):
+        if self.slave.start(master_ip, slave_ip):
+            res, okay = yield self.wait_slave(slave_ip)
+            if okay:
+                self.slave.confirm_started()
+            self.broadcast(res)
+            returnValue(True)
+        else:
+            returnValue(False)
+                    
+    @inlineCallbacks  
+    def wait_slave(self,ip):
+        res, okay = yield self.are_we_there_yet(ip,got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
+        returnValue((res,okay))
 
     @inlineCallbacks
     def are_we_there_yet(self,param,tester,on_success,failure,wait_for=False,max_tries=50):

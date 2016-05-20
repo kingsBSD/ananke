@@ -18,7 +18,8 @@ class Task(object):
         self.pool = Pool(max_workers=1)
         self.proc = False
         self.starting = False
-        self.running = False    
+        self.running = False
+        self.stopping = False
 
     def run(self,com, args):
         if self.starting or self.running:
@@ -41,16 +42,12 @@ class Task(object):
         self.running = True
         self.starting = False
 
+    def confirm_stopped(self):
+        self.running = False
+        self.stopping = False
+
     def is_running(self):
         return self.running
-
-class SocketServer(Task):
-
-    def __init__(self):
-        Task.__init__(self)    
-
-    def start(self):
-        Task.run(self,"/usr/bin/python3",["socket_server.py"])
 
 class MesosMaster(Task):
     
@@ -64,46 +61,22 @@ class MesosMaster(Task):
             return True
         else:
             return False        
-        
-#        if self.started:
-#            return {'okay': False, 'error':"A Meos master was already started."}
-#        self.ip = get_ip()
-#        if not self.ip:
-#            return {'okay': False, 'error':"No active network connection was found."}
-#        if self.running or got_cluster(self.ip):
-#            return {'okay': False, 'error':"A Meos master is already running."}
-#        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[self.ip]):
-#            return {'okay': True, 'ip':self.ip}    
-#        else:
-#            return {'okay':False, 'error':"Can't start a master."}
-                    
+                            
 class MesosSlave(Task):
     
     def __init__(self):
         Task.__init__(self)
         self.master_ip = False
-
+        self.ip = False
         
-    def start(self,ip):
-        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[ip,get_ip(),str(settings.MESOS_ADVERT_PORT)]):
-            self.master_ip = ip
-            self.starting = True
+    def start(self,master_ip,slave_ip):
+        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[master_ip,slave_ip,str(settings.MESOS_ADVERT_PORT)]):
+            self.master_ip = master_ip
+            self.ip = slave_ip
             return True
         else:
             return False
         
-#        if self.started:
-#            return {'okay': False, 'error':"A Meos slave was already started."}
-#        if self.running:
-#            return {'okay': False, 'error':"A Meos slave is already running."}
-#        if not got_cluster(ip):
-#            return {'okay': False, 'error':"Can't find the Mesos master."}
-#        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[ip,get_ip(),str(settings.MESOS_ADVERT_PORT)]):
-#            self.master_ip = ip
-#            return {'okay':True, 'ip':ip}
-#        else:
-#            return {'okay':False, 'error':"Can't start a slave."}
-
 class ClusterNoteBook(Task):
     
     def __init__(self):

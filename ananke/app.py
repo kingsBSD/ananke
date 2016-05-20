@@ -13,13 +13,13 @@ import msg
 from docgetter import get_docs
 from ipgetter import get_ip
 from servicegetters import got_cluster, got_slave, got_notebook
-from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook, SocketServer 
+from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook
 
 #master = MesosMaster()
 slave = MesosSlave()
 cnotebook = ClusterNoteBook()
 snode = SingleNode()
-sserver = SocketServer()
+
 
     
 
@@ -59,9 +59,16 @@ def status():
             
     return json.dumps(result)
     
+def valid_ip(ip): 
+    try:
+        chunks = ip.split('.')
+        return len(chunks) == 4 and all([c.isnumeric and 0 <= int(c) <= 255 for c in chunks])
+    except:
+        return False
+    
 @app.route('/api/startcluster')
 def start_master():
-    result = result = {'okay':False}
+    result = {'okay':False}
     ip = get_ip()
     if not got_cluster(ip):
         if not got_slave(ip):
@@ -75,17 +82,20 @@ def start_master():
 
 @app.route('/api/joincluster')
 def start_slave():
-    ip = request.args.get('ip', False)
-    try:
-        chunks = ip.split('.')
-        valid = len(chunks) == 4 and all([c.isnumeric and 0 <= int(c) <= 255 for c in chunks])
-    except:
-        valid = False
-    if valid:
-        result = slave.start(ip)
-        zocket_send(msg=msg.WAITSLAVE,ip=ip)
+    result = {'okay':False}
+    master_ip = request.args.get('ip', False)
+    if valid_ip(master_ip):
+        slave_ip = get_ip()
+        if got_cluster(master_ip):
+            if not got_slave(this_ip):
+                zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=slave_ip)
+                result['okay'] = True
+            else:
+                result['error'] = "This node is already a Mesos slave."
+        else:        
+            result['error'] = "Can't find the Mesos master."
     else:
-        result = {'okay':False, 'error':'Invalid IP address.'}
+        result['error'] = 'Invalid IP address.'
     return json.dumps(result)
 
 @app.route('/api/startclusternotebook')
