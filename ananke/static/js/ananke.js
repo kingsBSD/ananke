@@ -56,10 +56,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.join_cluster = function() {
         $scope.status = 'waiting';
         spinnerService.show('wait');
-        var masterip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
+        var master_ip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
         $scope.master_ip = master_ip
-        $http.get('api/joincluster',{params: {'ip':masterip}}).success(function(data, status, headers, config) {
-            $scope.master_url = masterip+":5050";
+        $http.get('api/joincluster',{params: {'ip':master_ip}}).success(function(data, status, headers, config) {
+            $scope.master_url = master_ip+":5050";
             if (!data.okay) {
                 $scope.error.msg = data.error;
                 $scope.status = 'dormant';
