@@ -15,7 +15,7 @@ from ipgetter import get_ip
 from servicegetters import got_cluster, got_slave, got_notebook
 from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook, SocketServer 
 
-master = MesosMaster()
+#master = MesosMaster()
 slave = MesosSlave()
 cnotebook = ClusterNoteBook()
 snode = SingleNode()
@@ -61,9 +61,16 @@ def status():
     
 @app.route('/api/startcluster')
 def start_master():
-    result = master.start()
-    if result['okay']:
-        zocket_send(msg=msg.WAITMASTER,ip=result['ip'])
+    result = result = {'okay':False}
+    ip = get_ip()
+    if not got_cluster(ip):
+        if not got_slave(ip):
+            zocket_send(msg=msg.STARTMASTER,ip=ip)
+            result = {'okay': True, 'ip':ip}
+        else:
+            result['error'] = "This node is already a Mesos slave."
+    else:
+        result['error'] = "A Meos master is already running."
     return json.dumps(result)
 
 @app.route('/api/joincluster')

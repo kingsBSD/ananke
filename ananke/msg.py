@@ -1,3 +1,4 @@
-WAITMASTER = "waitmaster"
+STARTMASTER = "startmaster"
+
 WAITSLAVE = "waitslave"
 WAITNOTEBOOK = "waitnotebook"

@@ -15,6 +15,7 @@ from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 
 from servicegetters import got_cluster, got_slave, got_notebook
+import tasks
 
 def sleep(delay):
     d = Deferred()
@@ -46,6 +47,8 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.subscriber = zpull
         self.subscriber.onPull = self.recv
         
+        self.master = tasks.MesosMaster()
+        
         
     def register(self,c):
         self.clients.append(c)
@@ -71,12 +74,17 @@ class NotificationServerFactory(WebSocketServerFactory):
         print(message)
         
         job = message.get('msg',False)
-        
-        if job == msg.WAITMASTER:
-            res, okay = yield self.are_we_there_yet(message['ip'],got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
-            if okay:
-                yield self.launch_slave(message['ip'])
-                self.broadcast(res)     
+
+        if job == msg.STARTMASTER:
+            if self.master.start(message['ip']):
+                res, okay = yield self.start_master(message['ip'])
+                self.broadcast(res)
+                if okay:
+                    self.master.confirm_started()
+                #    #yield self.launch_slave(message['ip'])
+                #    self.broadcast(res)
+            else:    
+                self.broadcast('start_master_failed')    
             
         if job == msg.WAITSLAVE:
             res, okay = yield self.are_we_there_yet(message['ip'],got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
@@ -89,9 +97,11 @@ class NotificationServerFactory(WebSocketServerFactory):
     def launch_slave(self,ip):
         requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
 
-    def master_okay(self,x,ip):
-        requests.get('http://127.0.0.1:5000/api/joincluster', params={'ip':ip})
-        return " ".join(["master_active",ip])
+    @inlineCallbacks  
+    def start_master(self,ip):
+        res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
+        returnValue((res,okay))
+
 
     @inlineCallbacks
     def are_we_there_yet(self,param,tester,on_success,failure,wait_for=False,max_tries=50):

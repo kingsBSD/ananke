@@ -17,10 +17,12 @@ class Task(object):
     def __init__(self):
         self.pool = Pool(max_workers=1)
         self.proc = False
-        self.started = False
+        self.starting = False
         self.running = False    
 
     def run(self,com, args):
+        if self.starting or self.running:
+            return False
         argstr = ' '.join(args)
         try:
             assert (stat(com).st_mode & 2**6) > 0
@@ -29,11 +31,15 @@ class Task(object):
             return False
         try:
             self.proc = self.pool.submit(subprocess.call, ' '.join([com,argstr]), shell=True)
-            self.started = True
+            self.starting = True
             return True
         except:
             print (com+" terminated!")
             return False
+
+    def confirm_started(self):
+        self.running = True
+        self.starting = False
 
     def is_running(self):
         return self.running
@@ -52,37 +58,51 @@ class MesosMaster(Task):
         Task.__init__(self)
         self.ip = False
 
-    def start(self):
-        if self.started:
-            return {'okay': False, 'error':"A Meos master was already started."}
-        self.ip = get_ip()
-        if not self.ip:
-            return {'okay': False, 'error':"No active network connection was found."}
-        if self.running or got_cluster(self.ip):
-            return {'okay': False, 'error':"A Meos master is already running."}
-        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[self.ip]):
-            return {'okay': True, 'ip':self.ip}    
+    def start(self,ip):
+        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[ip]):
+            self.master_ip = ip
+            return True
         else:
-            return {'okay':False, 'error':"Can't start a master."}
+            return False        
+        
+#        if self.started:
+#            return {'okay': False, 'error':"A Meos master was already started."}
+#        self.ip = get_ip()
+#        if not self.ip:
+#            return {'okay': False, 'error':"No active network connection was found."}
+#        if self.running or got_cluster(self.ip):
+#            return {'okay': False, 'error':"A Meos master is already running."}
+#        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[self.ip]):
+#            return {'okay': True, 'ip':self.ip}    
+#        else:
+#            return {'okay':False, 'error':"Can't start a master."}
                     
 class MesosSlave(Task):
     
     def __init__(self):
         Task.__init__(self)
         self.master_ip = False
+
         
     def start(self,ip):
-        if self.started:
-            return {'okay': False, 'error':"A Meos slave was already started."}
-        if self.running:
-            return {'okay': False, 'error':"A Meos slave is already running."}
-        if not got_cluster(ip):
-            return {'okay': False, 'error':"Can't find the Mesos master."}
         if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[ip,get_ip(),str(settings.MESOS_ADVERT_PORT)]):
             self.master_ip = ip
-            return {'okay':True, 'ip':ip}
+            self.starting = True
+            return True
         else:
-            return {'okay':False, 'error':"Can't start a slave."}
+            return False
+        
+#        if self.started:
+#            return {'okay': False, 'error':"A Meos slave was already started."}
+#        if self.running:
+#            return {'okay': False, 'error':"A Meos slave is already running."}
+#        if not got_cluster(ip):
+#            return {'okay': False, 'error':"Can't find the Mesos master."}
+#        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[ip,get_ip(),str(settings.MESOS_ADVERT_PORT)]):
+#            self.master_ip = ip
+#            return {'okay':True, 'ip':ip}
+#        else:
+#            return {'okay':False, 'error':"Can't start a slave."}
 
 class ClusterNoteBook(Task):
     
