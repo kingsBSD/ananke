@@ -1,5 +1,4 @@
 STARTMASTER = "startmaster"
 STARTSLAVE = "startslave"
+STARTPYSPARKNOTEBOOK = "startpysparknotebook"
 
-WAITSLAVE = "waitslave"
-WAITNOTEBOOK = "waitnotebook"

@@ -49,6 +49,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         
         self.master = tasks.MesosMaster()
         self.slave = tasks.MesosSlave()
+        self.pysparknb = tasks.PySparkNoteBook()
         
     def register(self,c):
         self.clients.append(c)
@@ -77,9 +78,9 @@ class NotificationServerFactory(WebSocketServerFactory):
 
         if job == msg.STARTMASTER:
             if self.master.start(message['ip']):
-                res, master_okay = yield self.wait_master(message['ip'])
+                res, okay = yield self.wait_master(message['ip'])
                 self.broadcast(res)
-                if master_okay:
+                if okay:
                     self.master.confirm_started()
                     slave_okay = yield self.start_slave(message['ip'],message['ip'])
             else:    
@@ -90,9 +91,14 @@ class NotificationServerFactory(WebSocketServerFactory):
             if not okay:
                 self.broadcast('start_slave_failed')
                                     
-        if job == msg.WAITNOTEBOOK:
-            res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
-            self.broadcast(res)       
+        if job == msg.STARTPYSPARKNOTEBOOK:
+            if self.pysparknb.start(message['ip']):
+                res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
+                self.broadcast(res)
+                if okay:
+                    self.pysparknb.confirm_started()
+            else:
+                self.broadcast('start_pysparknotebook_failed')
 
     @inlineCallbacks  
     def wait_master(self,ip):

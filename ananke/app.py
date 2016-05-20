@@ -13,16 +13,6 @@ import msg
 from docgetter import get_docs
 from ipgetter import get_ip
 from servicegetters import got_cluster, got_slave, got_notebook
-from tasks import MesosMaster, MesosSlave, SingleNode, ClusterNoteBook
-
-#master = MesosMaster()
-slave = MesosSlave()
-cnotebook = ClusterNoteBook()
-snode = SingleNode()
-
-
-    
-
 
 app = Flask(__name__)
 
@@ -32,7 +22,6 @@ def zocket_send(**kwargs):
     socket.bind("ipc:///tmp/sock")
     socket.send_json(kwargs)
     
-
 @app.route('/')
 def root():
     return app.send_static_file('index.html')
@@ -95,36 +84,32 @@ def start_slave():
         else:        
             result['error'] = "Can't find the Mesos master."
     else:
-        result['error'] = 'Invalid IP address.'
+        result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)
 
 @app.route('/api/startclusternotebook')
 def start_cluster_notebook():
+    result = {'okay':False}
     ip = request.args.get('ip', False)
-    result = cnotebook.start(ip)
-    if result['okay']:
-        zocket_send(msg=msg.WAITNOTEBOOK)
-    return json.dumps(result)
-
-@app.route('/api/ping')
-def ping():
-    zocket_send(ping="pong")
-    return json.dumps({'ping':'pong'})
+    if valid_ip(ip):
+        if got_cluster(ip):
+            if not got_notebook():
+                zocket_send(msg=msg.STARTPYSPARKNOTEBOOK, ip=ip)
+                result['okay'] = True
+            else:
+                 result['error'] = "A notebook was already started."
+        else:
+            result['error'] = "Can't find the Mesos master."
+    else:
+        result['error'] = 'Missing or invalid IP address.'
+    return json.dumps(result)        
+                
+#@app.route('/api/ping')
+#def ping():
+#    zocket_send(ping="pong")
+#    return json.dumps({'ping':'pong'})
     
 if __name__ == '__main__':
 
-    #sserver.start()
-
-    
-    
-
-    #while True:
-    #    zsocket.send(bytes("ananke hello",encoding="UTF-8"))
-    #    time.sleep(2)
-    
     app.run(debug=True)
-    
-    
-    #python3 '-c' 'import pydoc; pydoc.browse(port=9000,open_browser=False)'
-
     

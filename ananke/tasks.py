@@ -77,24 +77,14 @@ class MesosSlave(Task):
         else:
             return False
         
-class ClusterNoteBook(Task):
+class PySparkNoteBook(Task):
     
     def __init__(self):
         Task.__init__(self)
     
     def start(self,ip):
-        if self.started:
-            return {'okay': False, 'error':"A notebook was already started."}
-        if self.running:
-            return {'okay': False, 'error':"A notebook is already running."}
-        if not got_cluster(ip):
-            return {'okay': False, 'error':"Can't find the Mesos master."}
-        if Task.run(self,"/usr/local/bin/spark_jupyter_mesos_standalone",[ip]):
-            return {'okay':True, 'ip':ip}
-        else:
-            return {'okay':False, 'error':"Can't start a notebook."}        
-        
-  
+        return Task.run(self,"/usr/local/bin/spark_jupyter_mesos_standalone",[ip])
+         
 class SingleNode:
     
     def __init__(self):
