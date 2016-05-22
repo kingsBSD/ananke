@@ -87,7 +87,7 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast('start_master_failed')
                 
         if job == msg.STARTSLAVE:
-            okay = yield self.start_slave(msg['master_ip'], msg['slave_ip'])
+            okay = yield self.start_slave(message['master_ip'], message['slave_ip'])
             if not okay:
                 self.broadcast('start_slave_failed')
                                     

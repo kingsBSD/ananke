@@ -76,7 +76,7 @@ def start_slave():
     if valid_ip(master_ip):
         slave_ip = get_ip()
         if got_cluster(master_ip):
-            if not got_slave(this_ip):
+            if not got_slave(slave_ip):
                 zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=slave_ip)
                 result['okay'] = True
             else:
