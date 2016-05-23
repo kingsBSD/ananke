@@ -36,14 +36,22 @@ class NotificationProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         ## echo back message verbatim
-        print(payload)
-        self.sendMessage(payload, isBinary)
+        #print(payload)
+        
+        message = payload.decode("utf-8")
+        print(message)
+        
+        if message == 'local_socket':
+            self.factory.register_local(self)
+        
+        #self.sendMessage(payload, isBinary)
 
 class NotificationServerFactory(WebSocketServerFactory):
     
     def __init__(self,zpull,host='127.0.0.1',port=settings.WEBSOCKET_PORT):
         WebSocketServerFactory.__init__(self,"ws://"+host+":"+str(port))
         self.clients = []
+        self.local_clients = []
         self.subscriber = zpull
         self.subscriber.onPull = self.recv
         
@@ -54,15 +62,24 @@ class NotificationServerFactory(WebSocketServerFactory):
     def register(self,c):
         self.clients.append(c)
     
-    def unregister(self, client):
-        for c in self.clients:
-            print("unregistered client {}".format(c.peer))
-            self.clients.remove(c)
-    
-          
+    def unregister(self, c):
+        self.clients.remove(c)
+        if c in self.local_clients:
+            self.local_clients.remove(c)
+        
+    def register_local(self,c):
+        
+        if c not in self.local_clients:
+            self.local_clients.append(c)
+                     
     def broadcast(self,msg):
         print("Sending: "+msg)
         for c in self.clients:
+            c.sendMessage(str(msg).encode('utf8'))
+
+    def broadcast_local(self,msg):
+        print("Sending Locally: "+msg)
+        for c in self.local_clients:
             c.sendMessage(str(msg).encode('utf8'))
         
 # https://github.com/crossbario/autobahn-python/tree/master/examples/twisted/websocket/slowsquare        
@@ -79,26 +96,26 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.STARTMASTER:
             if self.master.start(message['ip']):
                 res, okay = yield self.wait_master(message['ip'])
-                self.broadcast(res)
+                self.broadcast_local(res)
                 if okay:
                     self.master.confirm_started()
                     slave_okay = yield self.start_slave(message['ip'],message['ip'])
             else:    
-                self.broadcast('start_master_failed')
+                self.broadcast_local('start_master_failed')
                 
         if job == msg.STARTSLAVE:
             okay = yield self.start_slave(message['master_ip'], message['slave_ip'])
             if not okay:
-                self.broadcast('start_slave_failed')
+                self.broadcast_local('start_slave_failed')
                                     
         if job == msg.STARTPYSPARKNOTEBOOK:
             if self.pysparknb.start(message['ip']):
                 res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
-                self.broadcast(res)
+                self.broadcast_local(res)
                 if okay:
                     self.pysparknb.confirm_started()
             else:
-                self.broadcast('start_pysparknotebook_failed')
+                self.broadcast_local('start_pysparknotebook_failed')
 
     @inlineCallbacks  
     def wait_master(self,ip):
@@ -111,7 +128,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             res, okay = yield self.wait_slave(slave_ip)
             if okay:
                 self.slave.confirm_started()
-            self.broadcast(res)
+            self.broadcast_local(res)
             returnValue(True)
         else:
             returnValue(False)
