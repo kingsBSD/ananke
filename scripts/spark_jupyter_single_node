@@ -1,1 +1,2 @@
+#!/bin/bash
 IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" spark-1.6.1-bin-hadoop2.6/bin/pyspark

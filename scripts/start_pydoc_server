@@ -1,1 +1,2 @@
+#!/bin/bash
 python3 '-c' 'import pydoc; pydoc.browse(port=9000,open_browser=False)'

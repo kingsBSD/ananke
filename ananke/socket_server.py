@@ -43,8 +43,7 @@ class NotificationProtocol(WebSocketServerProtocol):
         
         if message == 'local_socket':
             self.factory.register_local(self)
-        
-        #self.sendMessage(payload, isBinary)
+
 
 class NotificationServerFactory(WebSocketServerFactory):
     
@@ -172,11 +171,9 @@ if __name__ == '__main__':
 
 
     zf = ZmqFactory()
-    #endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
 
     pull = ZmqPullConnection(zf, endpoint)
-    #sub.subscribe(b'ananke')
 
     def doPrint(*args):
         print("message received: %r" % (args, ))

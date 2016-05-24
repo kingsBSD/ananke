@@ -1,21 +1,20 @@
 
-
 from os import stat 
-import subprocess
-from concurrent.futures import ThreadPoolExecutor as Pool
+
+from twisted.internet import reactor, protocol
 
 from ipgetter import get_ip
 import settings
-
 from servicegetters import got_cluster
 
-#http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
-
+class taskProtocol(protocol.ProcessProtocol):
+        
+    def kill(self):
+        self.transport.signalProcess('KILL')
 
 class Task(object):
     
     def __init__(self):
-        self.pool = Pool(max_workers=1)
         self.proc = False
         self.starting = False
         self.running = False
@@ -30,14 +29,12 @@ class Task(object):
         except:
             print (com+" is not executable!")
             return False
-        try:
-            self.proc = self.pool.submit(subprocess.call, ' '.join([com,argstr]), shell=True)
-            self.starting = True
-            return True
-        except:
-            print (com+" terminated!")
-            return False
-
+        
+        self.proc = taskProtocol()
+        reactor.spawnProcess(self.proc, com, args = [com]+args)
+        
+        return True
+        
     def confirm_started(self):
         self.running = True
         self.starting = False
