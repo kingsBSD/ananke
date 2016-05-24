@@ -1,5 +1,5 @@
 
-from os import stat 
+from os import stat, environ
 
 from twisted.internet import reactor, protocol
 
@@ -31,7 +31,7 @@ class Task(object):
             return False
         
         self.proc = taskProtocol()
-        reactor.spawnProcess(self.proc, com, args = [com]+args)
+        reactor.spawnProcess(self.proc, com, args = [com]+args, env = environ, usePTY=True)
         
         return True
         
