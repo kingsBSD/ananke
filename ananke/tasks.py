@@ -8,9 +8,20 @@ import settings
 from servicegetters import got_cluster
 
 class taskProtocol(protocol.ProcessProtocol):
-        
+    
+    def __init__(self,stopper):
+        self.on_stop = stopper
+    
     def kill(self):
         self.transport.signalProcess('KILL')
+
+    def processExited(self, reason):
+        self.on_stop()
+        print("processExited, status %d" % (reason.value.exitCode,))
+        
+    def processEnded(self, reason):
+        self.on_stop()
+        print("processEnded, status %d" % (reason.value.exitCode,))
 
 class Task(object):
     
@@ -30,11 +41,21 @@ class Task(object):
             print (com+" is not executable!")
             return False
         
-        self.proc = taskProtocol()
-        reactor.spawnProcess(self.proc, com, args = [com]+args, env = environ, usePTY=True)
-        
-        return True
-        
+        self.proc = taskProtocol(self.confirm_stopped)
+        try:
+            reactor.spawnProcess(self.proc, com, args = [com]+args, env = environ, usePTY=True)
+            self.starting = True
+            return True
+        except:
+            return False
+    
+    def stop(self):
+        if self.proc and (self.starting or self.running):
+            self.proc.kill()
+            return True
+        else:
+            return False
+    
     def confirm_started(self):
         self.running = True
         self.starting = False

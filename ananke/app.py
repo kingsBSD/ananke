@@ -97,12 +97,22 @@ def start_cluster_notebook():
                 zocket_send(msg=msg.STARTPYSPARKNOTEBOOK, ip=ip)
                 result['okay'] = True
             else:
-                 result['error'] = "A notebook was already started."
+                 result['error'] = "A notebook server was already started."
         else:
             result['error'] = "Can't find the Mesos master."
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
+
+@app.route('/api/stopclusternotebook')
+def stop_cluster_notebook():
+    result = {'okay':False}
+    if got_notebook():
+        zocket_send(msg=msg.KILLPYSPARKNOTEBOOK)
+        result['okay'] = True
+    else:
+        result['error'] = "No notebook server is active."
+    return json.dumps(result)
                 
 #@app.route('/api/ping')
 #def ping():

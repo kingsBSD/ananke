@@ -10,7 +10,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
     
-    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2};
+    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -39,6 +39,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'active'; $scope.slave_id = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.notebook_active:
                 $scope.status = 'active'; $scope.pysparknotebook = true; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.stopped_pysparknotebook:
+                $scope.status = 'active'; $scope.pysparknotebook = false; spinnerService.hide('wait'); $scope.$apply(); break;
         }    
     }    
                             
@@ -78,6 +80,17 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 spinnerService.hide('wait');     
             }
         }).error(function(data, status, headers, config) {});
+    };
+    
+    $scope.cluster_notebook_stop = function() {
+        $scope.status = 'waiting';
+        spinnerService.show('wait');
+        $http.get('api/stopclusternotebook',{params: {}}).success(function(data, status, headers, config) {
+            if (!data.okay) {
+                $scope.error.msg = data.error;
+                spinnerService.hide('wait');     
+            }
+        }).error(function(data, status, headers, config) {});  
     };
         
 });

@@ -3,18 +3,15 @@ import json
 
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
-
-import msg
-import settings
-
 import requests
-from twisted.python import log
 from twisted.internet import reactor, protocol
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
-
+from twisted.python import log
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 
+import msg
 from servicegetters import got_cluster, got_slave, got_notebook
+import settings
 import tasks
 
 def sleep(delay):
@@ -115,6 +112,13 @@ class NotificationServerFactory(WebSocketServerFactory):
                     self.pysparknb.confirm_started()
             else:
                 self.broadcast_local('start_pysparknotebook_failed')
+                
+        if job == msg.KILLPYSPARKNOTEBOOK:
+            if self.pysparknb.stop():
+                self.broadcast_local('stopped_pysparknotebook')
+            else:
+                self.broadcast_local('couldnt_stop_pysparknotebook')
+            
 
     @inlineCallbacks  
     def wait_master(self,ip):
