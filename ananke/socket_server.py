@@ -114,12 +114,22 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast_local('start_pysparknotebook_failed')
                 
         if job == msg.KILLPYSPARKNOTEBOOK:
+            self.slave.stop()
             if self.pysparknb.stop():
                 self.broadcast_local('stopped_pysparknotebook')
             else:
                 self.broadcast_local('couldnt_stop_pysparknotebook')
-            
-
+                
+        if job == msg.KILLMASTER:
+            self.slave.stop()
+            self.master.stop()
+           
+            self.broadcast_local('stopped_mesosmaster')
+                
+        if job == msg.KILLSLAVE:
+            self.slave.stop()
+            self.broadcast_local('stopped_mesosslave')
+                          
     @inlineCallbacks  
     def wait_master(self,ip):
         res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
@@ -172,7 +182,6 @@ class NotificationServerFactory(WebSocketServerFactory):
 if __name__ == '__main__':
 
     import sys
-
 
     zf = ZmqFactory()
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")

@@ -10,7 +10,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
     
-    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3};
+    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3, 'stopped_mesosmaster':4, 'stopped_mesosslave':5};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -41,6 +41,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'active'; $scope.pysparknotebook = true; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_pysparknotebook:
                 $scope.status = 'active'; $scope.pysparknotebook = false; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.stopped_mesosmaster:
+                $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.stopped_mesosslave:
+                $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;    
         }    
     }    
                             
@@ -83,16 +87,28 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     $scope.cluster_notebook_stop = function() {
+        stop_service('api/stopclusternotebook');
+    };
+ 
+    $scope.stop_cluster = function() {
+        stop_service('api/stopcluster');
+    };
+    
+    $scope.leave_cluster = function() {
+        stop_service('/api/leavecluster');
+    };
+    
+    stop_service = function(endpoint) {
         $scope.status = 'waiting';
         spinnerService.show('wait');
-        $http.get('api/stopclusternotebook',{params: {}}).success(function(data, status, headers, config) {
+        $http.get(endpoint,{params: {}}).success(function(data, status, headers, config) {
             if (!data.okay) {
                 $scope.error.msg = data.error;
                 spinnerService.hide('wait');     
             }
         }).error(function(data, status, headers, config) {});  
-    };
-        
+    };    
+    
 });
 
 mainModule.controller('docController',function($scope,$http) {

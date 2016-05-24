@@ -113,6 +113,32 @@ def stop_cluster_notebook():
     else:
         result['error'] = "No notebook server is active."
     return json.dumps(result)
+
+@app.route('/api/stopcluster')
+def stop_master():
+    result = {'okay':False}
+    if not got_notebook():
+        if got_cluster(get_ip()):
+            zocket_send(msg=msg.KILLMASTER)
+            result['okay'] = True
+        else:
+            result['error'] = "No Mesos master is active."            
+    else:
+        result['error'] = "A notebook server is still active."
+    return json.dumps(result)
+        
+@app.route('/api/leavecluster')
+def stop_slave():
+    result = {'okay':False}
+    if not got_notebook():
+        if got_cluster(get_ip()):
+            zocket_send(msg=msg.KILLSLAVE)
+            result['okay'] = True
+        else:
+            result['error'] = "No Mesos slave is active."            
+    else:
+        result['error'] = "A notebook server is still active."
+    return json.dumps(result)        
                 
 #@app.route('/api/ping')
 #def ping():

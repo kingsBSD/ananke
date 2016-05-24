@@ -17,11 +17,11 @@ class taskProtocol(protocol.ProcessProtocol):
 
     def processExited(self, reason):
         self.on_stop()
-        print("processExited, status %d" % (reason.value.exitCode,))
+        print(reason)
         
     def processEnded(self, reason):
         self.on_stop()
-        print("processEnded, status %d" % (reason.value.exitCode,))
+        print(reason)
 
 class Task(object):
     
@@ -31,7 +31,7 @@ class Task(object):
         self.running = False
         self.stopping = False
 
-    def run(self,com, args):
+    def run(self,com, args=[]):
         if self.starting or self.running:
             return False
         argstr = ' '.join(args)
@@ -42,15 +42,13 @@ class Task(object):
             return False
         
         self.proc = taskProtocol(self.confirm_stopped)
-        try:
-            reactor.spawnProcess(self.proc, com, args = [com]+args, env = environ, usePTY=True)
-            self.starting = True
-            return True
-        except:
-            return False
-    
+
+        reactor.spawnProcess(self.proc, com, args = [com]+args, env = environ, usePTY=True)
+        self.starting = True
+        return True
+
     def stop(self):
-        if self.proc and (self.starting or self.running):
+        if self.proc:
             self.proc.kill()
             return True
         else:
@@ -102,7 +100,7 @@ class PySparkNoteBook(Task):
     
     def start(self,ip):
         return Task.run(self,"/usr/local/bin/spark_jupyter_mesos_standalone",[ip])
-         
+                  
 class SingleNode:
     
     def __init__(self):
