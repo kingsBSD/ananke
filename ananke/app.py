@@ -104,6 +104,15 @@ def start_cluster_notebook():
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
 
+@app.route('/api/startsinglenotebook')
+def start_single_notebook():
+    result = {'okay':False}
+    if not got_notebook():
+        zocket_send(msg=msg.STARTSINGLENOTEBOOK)
+    else:
+        result['error'] = "A notebook server was already started."
+    return json.dumps(result)
+
 @app.route('/api/stopclusternotebook')
 def stop_cluster_notebook():
     result = {'okay':False}

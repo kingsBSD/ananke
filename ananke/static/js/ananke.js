@@ -10,7 +10,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
     
-    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3, 'stopped_mesosmaster':4, 'stopped_mesosslave':5};
+    var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
+        'stopped_mesosmaster':4, 'stopped_mesosslave':5, 'node_active':6};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -44,7 +45,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_mesosmaster:
                 $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_mesosslave:
-                $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;    
+                $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
         }    
     }    
                             
@@ -91,14 +93,18 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
  
     $scope.stop_cluster = function() {
-        stop_service('api/stopcluster');
+        simple_service('api/stopcluster');
     };
     
     $scope.leave_cluster = function() {
-        stop_service('/api/leavecluster');
+        simple_service('/api/leavecluster');
     };
     
-    stop_service = function(endpoint) {
+    $scope.start_single_node = function() {
+        simple_service('/api/startsinglenotebook');
+    };
+    
+    simple_service = function(endpoint) {
         $scope.status = 'waiting';
         spinnerService.show('wait');
         $http.get(endpoint,{params: {}}).success(function(data, status, headers, config) {
@@ -108,6 +114,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             }
         }).error(function(data, status, headers, config) {});  
     };    
+ 
+    
+   
     
 });
 

@@ -54,6 +54,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.master = tasks.MesosMaster()
         self.slave = tasks.MesosSlave()
         self.pysparknb = tasks.PySparkNoteBook()
+        self.snode = tasks.SingleNode()
         
     def register(self,c):
         self.clients.append(c)
@@ -106,15 +107,23 @@ class NotificationServerFactory(WebSocketServerFactory):
                                     
         if job == msg.STARTPYSPARKNOTEBOOK:
             if self.pysparknb.start(message['ip']):
-                res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),lambda x,y: "notebook_active","notebook_failed","Jupyter")    
+                res, okay = yield self.wait_notebook(single=False)    
                 self.broadcast_local(res)
                 if okay:
                     self.pysparknb.confirm_started()
             else:
                 self.broadcast_local('start_pysparknotebook_failed')
-                
+        
+        if job == msg.STARTSINGLENOTEBOOK:
+            if self.snode.start():
+                res, okay = yield self.wait_notebook(single=True)    
+                self.broadcast_local(res)
+                if okay:
+                    self.snode.confirm_started()
+            else:
+                self.broadcast_local('start_node_failed')
+            
         if job == msg.KILLPYSPARKNOTEBOOK:
-            self.slave.stop()
             if self.pysparknb.stop():
                 self.broadcast_local('stopped_pysparknotebook')
             else:
@@ -129,7 +138,19 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.KILLSLAVE:
             self.slave.stop()
             self.broadcast_local('stopped_mesosslave')
-                          
+    
+    @inlineCallbacks
+    def wait_notebook(self,single=True):
+        if single:
+            on_success = lambda x,y: "node_active"
+            failure = "node_failed"
+        else:
+            on_success = lambda x,y: "notebook_active"
+            failure = "notebook_failed"
+        res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),on_success,failure,"Jupyter")     
+        returnValue((res,okay))    
+            
+    
     @inlineCallbacks  
     def wait_master(self,ip):
         res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")

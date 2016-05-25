@@ -32,7 +32,7 @@ class Task(object):
         self.stopping = False
 
     def run(self,com, args=[]):
-        if self.starting or self.running:
+        if self.starting or self.running or self.stopping:
             return False
         argstr = ' '.join(args)
         try:
@@ -48,6 +48,7 @@ class Task(object):
         return True
 
     def stop(self):
+        self.stopping = True
         if self.proc:
             self.proc.kill()
             return True
@@ -57,9 +58,11 @@ class Task(object):
     def confirm_started(self):
         self.running = True
         self.starting = False
+        self.stopping = False
 
     def confirm_stopped(self):
         self.running = False
+        self.starting = False
         self.stopping = False
 
     def is_running(self):
@@ -101,10 +104,10 @@ class PySparkNoteBook(Task):
     def start(self,ip):
         return Task.run(self,"/usr/local/bin/spark_jupyter_mesos_standalone",[ip])
                   
-class SingleNode:
+class SingleNode(Task):
     
     def __init__(self):
-        self.running = False
+        Task.__init__(self)
             
-    def is_running(self):
-        return self.running            
+    def start(self):
+        return Task.run(self,"/usr/local/bin/spark_jupyter_single_node")

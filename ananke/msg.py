@@ -1,6 +1,8 @@
 STARTMASTER = "startmaster"
 STARTSLAVE = "startslave"
 STARTPYSPARKNOTEBOOK = "startpysparknotebook"
+STARTSINGLENOTEBOOK = "startsinglenotebook"
 KILLPYSPARKNOTEBOOK = "killpyspark"
 KILLMASTER = "killmaster"
 KILLSLAVE = "killslave"
+KILLSINGLENOTEBOOK = "killsinglenotebook"
