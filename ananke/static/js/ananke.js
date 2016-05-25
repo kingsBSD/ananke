@@ -11,7 +11,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.pysparknotebook = false;
     
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_mesosmaster':4, 'stopped_mesosslave':5, 'node_active':6};
+        'stopped_mesosmaster':4, 'stopped_mesosslave':5, 'node_active':6, 'stopped_singlenode':7};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -47,6 +47,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_mesosslave:
                 $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.stopped_singlenode: $scope.status = 'dormant'; spinnerService.hide('wait'); $scope.$apply(); break;          
         }    
     }    
                             
@@ -104,6 +105,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         simple_service('/api/startsinglenotebook');
     };
     
+    $scope.single_notebook_stop = function() {
+        simple_service('/api/stopsinglenotebook');
+    };
+    
     simple_service = function(endpoint) {
         $scope.status = 'waiting';
         spinnerService.show('wait');
@@ -115,9 +120,6 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         }).error(function(data, status, headers, config) {});  
     };    
  
-    
-   
-    
 });
 
 mainModule.controller('docController',function($scope,$http) {

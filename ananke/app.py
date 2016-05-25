@@ -123,6 +123,16 @@ def stop_cluster_notebook():
         result['error'] = "No notebook server is active."
     return json.dumps(result)
 
+@app.route('/api/stopsinglenotebook')
+def stop_single_notebook():
+    result = {'okay':False}
+    if got_notebook():
+        zocket_send(msg=msg.KILLSINGLENOTEBOOK)
+        result['okay'] = True
+    else:
+        result['error'] = "No notebook server is active."
+    return json.dumps(result)    
+
 @app.route('/api/stopcluster')
 def stop_master():
     result = {'okay':False}

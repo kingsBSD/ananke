@@ -1,13 +1,17 @@
 <span style="color:red;">{{error.msg}}</span>
 <form>
-    <button ng-click="start_cluster()">Start a cluster.</button>
-    <button ng-click="join_cluster()"> Join a cluster at: </button>
-    <span ng-repeat="chunk in ipchunks">
-        <input size="3" ng-model='chunk.i'>.
-    </span>
-    <span>
-        <input size="3" ng-model='chunk3.i'>.
-        <input size="3" ng-model='chunk4.i'>
-    </span>
-    <button ng-click="start_single_node()">Start a Jupyter notebook on a single Spark node.</button>
+    <p>
+        <button ng-click="start_cluster()">Start a cluster.</button>
+        <button ng-click="join_cluster()"> Join a cluster at: </button>
+        <span ng-repeat="chunk in ipchunks">
+            <input size="3" ng-model='chunk.i'>.
+        </span>
+        <span>
+            <input size="3" ng-model='chunk3.i'>.
+            <input size="3" ng-model='chunk4.i'>
+        </span>
+    </p>
+    <p>
+        <button ng-click="start_single_node()">Start a Jupyter notebook on a single Spark node.</button>
+    </p>
 </form>

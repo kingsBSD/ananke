@@ -128,7 +128,13 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast_local('stopped_pysparknotebook')
             else:
                 self.broadcast_local('couldnt_stop_pysparknotebook')
-                
+        
+        if job == msg.KILLSINGLENOTEBOOK:
+            if self.snode.stop():
+                self.broadcast_local('stopped_singlenode')
+            else:
+                self.broadcast_local('couldnt_stop_singlenode')
+        
         if job == msg.KILLMASTER:
             self.slave.stop()
             self.master.stop()
