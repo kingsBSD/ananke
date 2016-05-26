@@ -1,4 +1,4 @@
 #!/bin/bash
 #export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6
 #export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --driver-memory 128m --master mesos://$1:5050
+IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --driver-memory 4g --master mesos://$1:5050
