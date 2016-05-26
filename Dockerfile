@@ -102,7 +102,7 @@ RUN mkdir -p /var/lib/mesos
 RUN mkdir -p /var/lib/mesosmaster
 RUN mkdir -p /var/log/mesosmaster
 RUN mkdir -p /var/log/mesosslave
-RUN mkdir /var/www/spark
+RUN mkdir -p /var/www/spark
 
 ADD scripts /usr/local/bin
 ADD ananke /var/www/ananke
