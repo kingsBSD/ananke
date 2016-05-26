@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /var/www/ananke
+uwsgi -s /tmp/uwsgi.sock -w app:app --chmod-socket=666

@@ -53,6 +53,8 @@ RUN npm install -g configurable-http-proxy
 RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
 RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
 
+#RUN rm spark-1.6.1-bin-hadoop2.6.tgz
+
 RUN  wget http://www.apache.org/dist/mesos/0.28.1/mesos-0.28.1.tar.gz
 RUN tar -zxf mesos-0.28.1.tar.gz
 RUN rm mesos-0.28.1.tar.gz
@@ -82,7 +84,8 @@ RUN pip3 install scikit-learn
 RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
+    nginx
 
 # https://github.com/Kronuz/pyScss/issues/308
 ENV LC_CTYPE C.UTF-8
@@ -93,9 +96,21 @@ RUN pip3 install PyZMQ
 RUN pip3 install txZMQ
 RUN pip3 install flask
 RUN pip3 install requests
+RUN pip3 install uwsgi
+
+RUN mkdir -p /var/lib/mesos
+RUN mkdir -p /var/lib/mesosmaster
+RUN mkdir -p /var/log/mesosmaster
+RUN mkdir -p /var/log/mesosslave
+RUN mkdir /var/www/spark
 
 ADD scripts /usr/local/bin
-ADD ananke /ananke
+ADD ananke /var/www/ananke
+ADD conf /spark-1.6.1-bin-hadoop2.6/conf
+ADD sites-available /etc/nginx/sites-available
+RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
+RUN ln -s /spark-1.6.1-bin-hadoop2.6.tgz /var/www/spark
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #ENV SPARK_HOME = /spark-1.6.1-bin-hadoop2.6
 
@@ -105,7 +120,13 @@ ADD ananke /ananke
 
 # sudo docker run -ti --name jupyter --net=host -p 8888:8888 -p 5050:5050 ananke /bin/bash
 
-CMD ["/bin/bash", "-c", "./spark_jupyter_standalone"]
+CMD ["/usr/bin/supervisord"]
 
-# ./bin/mesos-master.sh --ip=127.0.0.1 --work_dir=/var/lib/mesos
+#spark-env.sh
+#export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6 
+#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
+##export spark.mesos.executor.home=/spark-1.6.1-bin-hadoop2.6
 
+#spark-defaults.conf
+#spark.executor.uri http://localhost:5000/spark/spark-1.6.1-bin-hadoop2.6.tgz
+#spark.mesos.executor.home /spark-1.6.1-bin-hadoop2.6
