@@ -59,7 +59,8 @@ RUN  wget http://www.apache.org/dist/mesos/0.28.1/mesos-0.28.1.tar.gz
 RUN tar -zxf mesos-0.28.1.tar.gz
 RUN rm mesos-0.28.1.tar.gz
 RUN mkdir -p /mesos-0.28.1/build    
-RUN cd /mesos-0.28.1/build && ../configure && make && make install
+RUN cd /mesos-0.28.1/build && ../configure && make && make install 
+#RUN cd /mesos-0.28.1/build && make check
 
 RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
 RUN tar -zxf hadoop-2.7.2.tar.gz
