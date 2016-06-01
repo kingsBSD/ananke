@@ -51,7 +51,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.subscriber = zpull
         self.subscriber.onPull = self.recv
         
-        self.master = tasks.MesosMaster()
+        self.master = tasks.SparkMaster()
         self.slave = tasks.MesosSlave()
         self.pysparknb = tasks.PySparkNoteBook()
         self.snode = tasks.SingleNode()
@@ -159,7 +159,7 @@ class NotificationServerFactory(WebSocketServerFactory):
     
     @inlineCallbacks  
     def wait_master(self,ip):
-        res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Mesos master")
+        res, okay = yield self.are_we_there_yet(ip,got_cluster,lambda x,ip: " ".join(["master_active",ip]),"master_failed","Spark master")
         returnValue((res,okay))
 
     @inlineCallbacks 

@@ -20,13 +20,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     supervisor \
     wget 
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
-    libapr1-dev \
-    libcurl4-nss-dev \
-    libsasl2-dev \
-    libsasl2-modules \
-    libsvn-dev \
-    maven    
+#RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
+#    libapr1-dev \
+#    libcurl4-nss-dev \
+#    libsasl2-dev \
+#    libsasl2-modules \
+#    libsvn-dev \
+#    maven    
 
 # Packages needed to build Numpy, Sci-Kit Learn...        
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \                
@@ -52,14 +52,13 @@ RUN npm install -g configurable-http-proxy
    
 RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
 RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
+RUN rm spark-1.6.1-bin-hadoop2.6.tgz
 
-#RUN rm spark-1.6.1-bin-hadoop2.6.tgz
-
-RUN  wget http://www.apache.org/dist/mesos/0.28.1/mesos-0.28.1.tar.gz
-RUN tar -zxf mesos-0.28.1.tar.gz
-RUN rm mesos-0.28.1.tar.gz
-RUN mkdir -p /mesos-0.28.1/build    
-RUN cd /mesos-0.28.1/build && ../configure && make && make install 
+#RUN  wget http://www.apache.org/dist/mesos/0.28.1/mesos-0.28.1.tar.gz
+#RUN tar -zxf mesos-0.28.1.tar.gz
+#RUN rm mesos-0.28.1.tar.gz
+#RUN mkdir -p /mesos-0.28.1/build    
+#RUN cd /mesos-0.28.1/build && ../configure && make && make install 
 #RUN cd /mesos-0.28.1/build && make check
 
 RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
@@ -99,11 +98,11 @@ RUN pip3 install flask
 RUN pip3 install requests
 RUN pip3 install uwsgi
 
-RUN mkdir -p /var/lib/mesos
-RUN mkdir -p /var/lib/mesosmaster
-RUN mkdir -p /var/log/mesosmaster
-RUN mkdir -p /var/log/mesosslave
-RUN mkdir -p /var/www/spark
+#RUN mkdir -p /var/lib/mesos
+#RUN mkdir -p /var/lib/mesosmaster
+#RUN mkdir -p /var/log/mesosmaster
+#RUN mkdir -p /var/log/mesosslave
+#RUN mkdir -p /var/www/spark
 
 ADD scripts /usr/local/bin
 ADD ananke /var/www/ananke

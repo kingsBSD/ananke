@@ -64,9 +64,9 @@ def start_master():
             zocket_send(msg=msg.STARTMASTER,ip=ip)
             result = {'okay': True, 'ip':ip}
         else:
-            result['error'] = "This node is already a Mesos slave."
+            result['error'] = "This node is already a Spark slave."
     else:
-        result['error'] = "A Meos master is already running."
+        result['error'] = "A Spark master is already running."
     return json.dumps(result)
 
 @app.route('/api/joincluster')

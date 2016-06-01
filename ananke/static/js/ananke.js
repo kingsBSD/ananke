@@ -11,7 +11,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.pysparknotebook = false;
     
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_mesosmaster':4, 'stopped_mesosslave':5, 'node_active':6, 'stopped_singlenode':7};
+        'stopped_sparkmaster':4, 'stopped_mesosslave':5, 'node_active':6, 'stopped_singlenode':7};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -42,7 +42,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'active'; $scope.pysparknotebook = true; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_pysparknotebook:
                 $scope.status = 'active'; $scope.pysparknotebook = false; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.stopped_mesosmaster:
+            case msg.stopped_sparkmaster:
                 $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_mesosslave:
                 $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;
@@ -69,7 +69,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         var master_ip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
         $scope.master_ip = master_ip
         $http.get('api/joincluster',{params: {'ip':master_ip}}).success(function(data, status, headers, config) {
-            $scope.master_url = master_ip+":5050";
+            $scope.master_url = master_ip+":8080";
             if (!data.okay) {
                 $scope.error.msg = data.error;
                 $scope.status = 'dormant';

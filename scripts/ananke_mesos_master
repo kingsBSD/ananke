@@ -1,4 +1,0 @@
-#!/bin/bash
-#export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6
-#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-/mesos-0.28.1/build/bin/mesos-master.sh --ip=$1 --work_dir=/var/lib/mesosmaster --log_dir=/var/log/mesosmaster

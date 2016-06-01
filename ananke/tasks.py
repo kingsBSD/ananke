@@ -68,14 +68,14 @@ class Task(object):
     def is_running(self):
         return self.running
 
-class MesosMaster(Task):
+class SparkMaster(Task):
     
     def __init__(self):
         Task.__init__(self)
         self.ip = False
 
     def start(self,ip):
-        if Task.run(self,"/usr/local/bin/ananke_mesos_master",[ip]):
+        if Task.run(self,"/usr/local/bin/ananke_spark_master",[ip]):
             self.master_ip = ip
             return True
         else:

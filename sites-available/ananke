@@ -1,11 +1,7 @@
 server {
     listen 5000;
     server_name ananke;
-    
-    location /spark {
-        alias /var/www/spark; 
-    }
-    
+        
     location /static {
         alias /var/www/ananke/static; 
     }

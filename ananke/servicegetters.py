@@ -10,7 +10,7 @@ notebookport = str(settings.NOTEBOOK_PORT)
 
 def got_cluster(ip):
     try:
-        return requests.get("http://"+ip+":5050",timeout=2).status_code == 200
+        return requests.get("http://"+ip+":8080",timeout=2).status_code == 200
     except:
         return False
     
