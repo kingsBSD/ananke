@@ -12,7 +12,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.pysparknotebook = false;
     
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_sparkmaster':4, 'stopped_mesosslave':5, 'node_active':6, 'stopped_singlenode':7};
+        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
@@ -45,7 +45,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'active'; $scope.pysparknotebook = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_sparkmaster:
                 $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.stopped_mesosslave:
+            case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_singlenode: $scope.status = 'dormant'; spinnerService.hide('wait'); $scope.$apply(); break;          
@@ -91,7 +91,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     $scope.cluster_notebook_stop = function() {
-        stop_service('api/stopclusternotebook');
+        simple_service('api/stopclusternotebook');
     };
  
     $scope.stop_cluster = function() {

@@ -136,14 +136,16 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast_local('couldnt_stop_singlenode')
         
         if job == msg.KILLMASTER:
-            self.slave.stop()
-            self.master.stop()
-           
-            self.broadcast_local('stopped_mesosmaster')
+            killer = tasks.MasterKiller()
+            killer.start()
+            killer = tasks.SlaveKiller()
+            killer.start() 
+            self.broadcast_local('stopped_sparkmaster')
                 
         if job == msg.KILLSLAVE:
-            self.slave.stop()
-            self.broadcast_local('stopped_mesosslave')
+            killer = tasks.SlaveKiller()
+            killer.start()
+            self.broadcast_local('stopped_sparkslave')
     
     @inlineCallbacks
     def wait_notebook(self,single=True):
