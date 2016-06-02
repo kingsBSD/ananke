@@ -52,7 +52,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.subscriber.onPull = self.recv
         
         self.master = tasks.SparkMaster()
-        self.slave = tasks.MesosSlave()
+        self.slave = tasks.SparkSlave()
         self.pysparknb = tasks.PySparkNoteBook()
         self.snode = tasks.SingleNode()
         
@@ -153,7 +153,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         else:
             on_success = lambda x,y: "notebook_active"
             failure = "notebook_failed"
-        res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),on_success,failure,"Jupyter")     
+        res, okay = yield self.are_we_there_yet(None,lambda x,y:got_notebook(),on_success,failure,"Jupyter")     
         returnValue((res,okay))    
             
     
@@ -175,7 +175,7 @@ class NotificationServerFactory(WebSocketServerFactory):
                     
     @inlineCallbacks  
     def wait_slave(self,ip):
-        res, okay = yield self.are_we_there_yet(ip,got_slave,lambda sid,x: " ".join(["slave_active",sid]),"slave_failed","Mesos slave")
+        res, okay = yield self.are_we_there_yet(ip,got_slave,lambda x,ip: " ".join(["slave_active",ip]),"slave_failed","Spark slave")
         returnValue((res,okay))
 
     @inlineCallbacks

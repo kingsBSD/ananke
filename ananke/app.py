@@ -80,9 +80,9 @@ def start_slave():
                 zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=slave_ip)
                 result['okay'] = True
             else:
-                result['error'] = "This node is already a Mesos slave."
+                result['error'] = "This node is already a Spark slave."
         else:        
-            result['error'] = "Can't find the Mesos master."
+            result['error'] = "Can't find the Spark master."
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)

@@ -5,7 +5,7 @@ import requests
 
 import settings
 
-madvertport = str(settings.MESOS_ADVERT_PORT)
+madvertport = str(settings.SPARK_SLAVE_PORT)
 notebookport = str(settings.NOTEBOOK_PORT)
 
 def got_cluster(ip):
@@ -16,7 +16,7 @@ def got_cluster(ip):
     
 def got_slave(ip):
     try:
-        return json.loads(requests.get("http://"+ip+":"+madvertport+"/state.json",timeout=2).text)['id']
+        return requests.get("http://"+ip+":8081",timeout=2).status_code == 200
     except:
         return False
     

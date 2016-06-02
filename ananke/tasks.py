@@ -81,7 +81,7 @@ class SparkMaster(Task):
         else:
             return False        
                             
-class MesosSlave(Task):
+class SparkSlave(Task):
     
     def __init__(self):
         Task.__init__(self)
@@ -89,7 +89,7 @@ class MesosSlave(Task):
         self.ip = False
         
     def start(self,master_ip,slave_ip):
-        if Task.run(self,"/usr/local/bin/ananke_mesos_slave",[master_ip,slave_ip,str(settings.MESOS_ADVERT_PORT)]):
+        if Task.run(self,"/usr/local/bin/ananke_spark_slave",[master_ip,slave_ip,str(settings.SPARK_SLAVE_PORT)]):
             self.master_ip = master_ip
             self.ip = slave_ip
             return True
