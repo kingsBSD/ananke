@@ -153,7 +153,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         else:
             on_success = lambda x,y: "notebook_active"
             failure = "notebook_failed"
-        res, okay = yield self.are_we_there_yet(None,lambda x,y:got_notebook(),on_success,failure,"Jupyter")     
+        res, okay = yield self.are_we_there_yet(None,lambda x:got_notebook(),on_success,failure,"Jupyter")     
         returnValue((res,okay))    
             
     

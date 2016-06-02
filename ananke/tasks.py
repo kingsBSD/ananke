@@ -102,7 +102,7 @@ class PySparkNoteBook(Task):
         Task.__init__(self)
     
     def start(self,ip):
-        return Task.run(self,"/usr/local/bin/spark_jupyter_mesos_standalone",[ip])
+        return Task.run(self,"/usr/local/bin/spark_jupyter_standalone",[ip])
                   
 class SingleNode(Task):
     
