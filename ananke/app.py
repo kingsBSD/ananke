@@ -38,10 +38,10 @@ def status():
     if ip:
         result['network'] = True
         result['ip'] = ip.split('.')
-        result['slave_id'] = got_slave(ip)
+        result['slave_ip'] = got_slave(ip)
         result['master_owner'] = got_cluster(ip)
         result['pysparknotebook'] = got_notebook()
-        if result['master_owner'] or result['slave_id']:
+        if result['master_owner'] or result['slave_ip']:
             result['status'] = 'active'
         else:
             result['status'] = 'dormant'

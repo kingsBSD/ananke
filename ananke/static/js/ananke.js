@@ -6,7 +6,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.chunk3 = {};
     $scope.chunk4 = {};
     $scope.error = {};
-    $scope.slave_id = false;
+    $scope.slave_ip = false;
+    $scope.slave_owner = {"active":false};
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
     
@@ -16,8 +17,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.network) {
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
-            $scope.master_url=data.ip.join('.')+":8080";
-            $scope.slave_id = data.slave_id;
+            $scope.master_url = data.ip.join('.')+":8080";
+            $scope.slave_ip = data.slave_ip;
             $scope.master_owner = data.master_owner;
             $scope.pysparknotebook = data.pysparknotebook;
         }
@@ -37,7 +38,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.master_active:
                 $scope.status = 'active'; $scope.master_owner = true; $scope.master_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.slave_active:
-                $scope.status = 'active'; $scope.slave_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
+                $scope.status = 'active'; $scope.slave_ip = msChunks[1]; $scope.slave_owner.active = true; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.notebook_active:
                 $scope.status = 'active'; $scope.pysparknotebook = true; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_pysparknotebook:
@@ -45,7 +46,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkmaster:
                 $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_mesosslave:
-                $scope.status = 'dormant'; $scope.slave_id = false; spinnerService.hide('wait'); $scope.$apply(); break;
+                $scope.status = 'dormant'; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_singlenode: $scope.status = 'dormant'; spinnerService.hide('wait'); $scope.$apply(); break;          
         }    

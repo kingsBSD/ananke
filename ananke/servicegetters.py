@@ -16,7 +16,10 @@ def got_cluster(ip):
     
 def got_slave(ip):
     try:
-        return requests.get("http://"+ip+":8081",timeout=2).status_code == 200
+        if requests.get("http://"+ip+":8081",timeout=2).status_code == 200:
+            return ip
+        else:
+            return False
     except:
         return False
     

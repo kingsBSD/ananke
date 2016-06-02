@@ -1,9 +1,9 @@
 <div>
     <p>You started a Spark master at <a ng-href="http://{{master_url}}" target="new">{{master_url}}</a>.</p>
     <p>(Give your friends its IP address and ask them to join it.)</p>
-    <p ng-if="!slave_ip">A Spark slave should start shortly...</p>
-    <p ng-if="slave_id">Your Spark slave is at: <a ng-href="http://{{slave_ip}}:8081" target="new">{{slave_id}}:8081</a>.</p>
-</div>
+    <p ng-if="!slave_owner.active">A Spark slave should start shortly...</p>
+    <p ng-if="slave_owner.active">Your Spark slave is at: <a ng-href="http://{{slave_ip}}:8081" target="new">{{slave_ip}}:8081</a>.</p>
+<div>
 
 
 
