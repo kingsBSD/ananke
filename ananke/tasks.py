@@ -80,23 +80,7 @@ class SparkMaster(Task):
             return True
         else:
             return False        
-                
-class MasterKiller(Task):
-    
-    def __init__(self):
-        Task.__init__(self)
-         
-    def start(self):
-        Task.run(self,"/spark-1.6.1-bin-hadoop2.6/sbin/stop-master.sh",[])
-            
-class SlaveKiller(Task):
-    
-    def __init__(self):
-        Task.__init__(self)
-         
-    def start(self):
-        Task.run(self,"/spark-1.6.1-bin-hadoop2.6/sbin/stop-slave.sh",[])            
-                
+                                
 class SparkSlave(Task):
     
     def __init__(self):

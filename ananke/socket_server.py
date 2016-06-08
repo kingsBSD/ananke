@@ -136,15 +136,13 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast_local('couldnt_stop_singlenode')
         
         if job == msg.KILLMASTER:
-            killer = tasks.MasterKiller()
-            killer.start()
-            killer = tasks.SlaveKiller()
-            killer.start() 
+            self.master.stop()
             self.broadcast_local('stopped_sparkmaster')
+            self.slave.stop()
+            self.broadcast_local('stopped_sparkslave')
                 
         if job == msg.KILLSLAVE:
-            killer = tasks.SlaveKiller()
-            killer.start()
+            self.slave.stop()
             self.broadcast_local('stopped_sparkslave')
     
     @inlineCallbacks

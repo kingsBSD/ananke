@@ -1,3 +1,4 @@
 #!/bin/bash
 export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6
-/spark-1.6.1-bin-hadoop2.6/sbin/start-slave.sh -h $2 -p $3 spark://$1:7077
+#/spark-1.6.1-bin-hadoop2.6/sbin/start-slave.sh -h $2 -p $3 spark://$1:7077
+/spark-1.6.1-bin-hadoop2.6/bin/spark-class org.apache.spark.deploy.worker.Worker -i $2 -p $3 spark://$1:7077

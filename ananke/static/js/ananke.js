@@ -46,7 +46,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkmaster:
                 $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_sparkslave:
-                $scope.status = 'dormant'; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
+                $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_singlenode: $scope.status = 'dormant'; spinnerService.hide('wait'); $scope.$apply(); break;          
         }    
