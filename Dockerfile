@@ -85,8 +85,11 @@ RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
-    nginx
+    nginx \
+    ssh
 
+#RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''
+        
 # https://github.com/Kronuz/pyScss/issues/308
 ENV LC_CTYPE C.UTF-8
 
@@ -98,13 +101,17 @@ RUN pip3 install flask
 RUN pip3 install requests
 RUN pip3 install uwsgi
 
-#RUN mkdir -p /var/lib/mesos
-#RUN mkdir -p /var/lib/mesosmaster
-#RUN mkdir -p /var/log/mesosmaster
-#RUN mkdir -p /var/log/mesosslave
-#RUN mkdir -p /var/www/spark
+RUN chown -R hadoop:hadoop hadoop-2.7.2
+RUN useradd -m hdfs
+RUN echo 'hdfs:hdfs' | chpasswd
+USER hdfs
+RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa
+#RUN  cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+USER root
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN sed 's/Port\s22/Port 2222/' -i /etc/ssh/sshd_config
 
-ADD scripts /usr/local/bin
+ADD scripts /usr/local/bin 
 ADD ananke /var/www/ananke
 ADD conf /spark-1.6.1-bin-hadoop2.6/conf
 ADD sites-available /etc/nginx/sites-available
