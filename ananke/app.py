@@ -150,11 +150,11 @@ def stop_master():
 def stop_slave():
     result = {'okay':False}
     if not got_notebook():
-        if got_cluster(get_ip()):
+        if got_slave(get_ip()):
             zocket_send(msg=msg.KILLSLAVE)
             result['okay'] = True
         else:
-            result['error'] = "No Mesos slave is active."            
+            result['error'] = "No Spark slave is active."            
     else:
         result['error'] = "A notebook server is still active."
     return json.dumps(result)        
