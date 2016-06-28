@@ -98,27 +98,16 @@ RUN pip3 install flask
 RUN pip3 install requests
 RUN pip3 install uwsgi
 
-#RUN mkdir -p /var/lib/mesos
-#RUN mkdir -p /var/lib/mesosmaster
-#RUN mkdir -p /var/log/mesosmaster
-#RUN mkdir -p /var/log/mesosslave
-#RUN mkdir -p /var/www/spark
+RUN mkdir -p /data
 
 ADD scripts /usr/local/bin
 ADD ananke /var/www/ananke
 ADD conf /spark-1.6.1-bin-hadoop2.6/conf
 ADD sites-available /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
-RUN ln -s /spark-1.6.1-bin-hadoop2.6.tgz /var/www/spark
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #ENV SPARK_HOME = /spark-1.6.1-bin-hadoop2.6
-
-#Failed to load native Mesos library from /usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
-#/mesos-0.28.1/build/bin/mesos-slave.sh --master=172.17.0.2:5050 --launcher=posix
-#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-
-# sudo docker run -ti --name jupyter --net=host -p 8888:8888 -p 5050:5050 ananke /bin/bash
 
 CMD ["/usr/bin/supervisord"]
 
