@@ -1,4 +1,9 @@
 #!/bin/bash
 #export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6
 cd /data
-IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --master spark://$1:7077
+#IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --jars /sparkjars/commons-csv-1.1.jar,/sparkjars/spark-csv_2.10-1.0.0.jar  --master spark://$1:7077
+IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --packages com.databricks:spark-csv_2.11:1.4.0  --master spark://$1:7077
+
+
+ 
+

@@ -54,16 +54,13 @@ RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spa
 RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
 RUN rm spark-1.6.1-bin-hadoop2.6.tgz
 
-#RUN  wget http://www.apache.org/dist/mesos/0.28.1/mesos-0.28.1.tar.gz
-#RUN tar -zxf mesos-0.28.1.tar.gz
-#RUN rm mesos-0.28.1.tar.gz
-#RUN mkdir -p /mesos-0.28.1/build    
-#RUN cd /mesos-0.28.1/build && ../configure && make && make install 
-#RUN cd /mesos-0.28.1/build && make check
+#RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
+#RUN tar -zxf hadoop-2.7.2.tar.gz
+#RUN rm hadoop-2.7.2.tar.gz
 
-RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
-RUN tar -zxf hadoop-2.7.2.tar.gz
-RUN rm hadoop-2.7.2.tar.gz
+RUN mkdir sparkjars
+RUN cd /sparkjars && wget http://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.1/commons-csv-1.1.jar
+RUN cd /sparkjars && wget http://repo1.maven.org/maven2/com/databricks/spark-csv_2.10/1.0.0/spark-csv_2.10-1.0.0.jar
 
 RUN pip3 install jupyterhub
 RUN pip3 install "ipython[notebook]"
@@ -77,9 +74,10 @@ RUN pip3 install numpy
 RUN pip3 install pandas        
 RUN pip3 install scipy
 RUN pip3 install scikit-learn        
-
-#ADD kernals /usr/local/share/jupyter/kernels
-#RUN python -m ipykernel.kernelspec
+RUN pip3 install pyldavis
+RUN pip3 install lda
+RUN pip3 install gensim
+RUN pip3 install folium
 
 RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
@@ -96,6 +94,7 @@ RUN pip3 install PyZMQ
 RUN pip3 install txZMQ
 RUN pip3 install flask
 RUN pip3 install requests
+RUN pip3 install bs4
 RUN pip3 install uwsgi
 
 RUN mkdir -p /data
