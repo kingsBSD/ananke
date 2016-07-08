@@ -73,11 +73,14 @@ RUN pip3 install nltk
 RUN pip3 install numpy
 RUN pip3 install pandas        
 RUN pip3 install scipy
-RUN pip3 install scikit-learn        
+RUN pip3 install scikit-learn
 RUN pip3 install pyldavis
 RUN pip3 install lda
 RUN pip3 install gensim
+RUN pip3 install pyemd
 RUN pip3 install folium
+
+RUN python3 -m nltk.downloader punkt
 
 RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
