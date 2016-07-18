@@ -45,6 +45,8 @@ def status():
             result['status'] = 'active'
         else:
             result['status'] = 'dormant'
+    else:
+        result['status'] = 'error'
             
     return json.dumps(result)
     

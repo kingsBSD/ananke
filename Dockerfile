@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:trusty
 
 # https://arnesund.com/2015/09/21/spark-cluster-on-openstack-with-multi-user-jupyter-notebook/
 
@@ -10,7 +10,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     build-essential \
     curl \
     nano \
-    openjdk-8-jdk \
+    openjdk-7-jdk \
     python-dev \
     python-pip \
     python3-dev \

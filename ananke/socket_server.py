@@ -212,6 +212,9 @@ if __name__ == '__main__':
 
     ip = get_ip()
 
+    if not ip:
+        ip = '127.0.0.1'
+
     zf = ZmqFactory()
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
 
