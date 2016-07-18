@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 
 # https://arnesund.com/2015/09/21/spark-cluster-on-openstack-with-multi-user-jupyter-notebook/
 
@@ -10,7 +10,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     build-essential \
     curl \
     nano \
-    openjdk-7-jdk \
+    openjdk-8-jdk \
     python-dev \
     python-pip \
     python3-dev \
@@ -45,7 +45,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
         libfreetype6-dev \
         pkg-config    
     
-RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -    
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -    
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install nodejs    
     
 RUN npm install -g configurable-http-proxy    
@@ -86,6 +86,7 @@ RUN ipython profile create pyspark
 RUN jupyter notebook --generate-config
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
+    net-tools \
     nginx
 
 # https://github.com/Kronuz/pyScss/issues/308
