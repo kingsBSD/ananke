@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import itertools
 import os
 import re
@@ -10,6 +12,19 @@ def get_ip():
             if ip:
                 return ip[0]
     return False
+    
+if __name__ == '__main__':
+
+    ip = get_ip()
+    
+    if ip:
+        msg = "* Visit http://"+ip+":5000 *"
+        border = len(msg) * "*"
+    
+        print(border)
+        print(msg)
+        print(border)
+        
     
 
 
