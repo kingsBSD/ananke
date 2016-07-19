@@ -6,14 +6,11 @@ FROM ubuntu:trusty
 
 RUN apt-get clean && apt-get -q -y update
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install openjdk-7-jdk
-
-RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
-
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     build-essential \
     curl \
     nano \
+    openjdk-7-jdk \
     python-dev \
     python-pip \
     python3-dev \
