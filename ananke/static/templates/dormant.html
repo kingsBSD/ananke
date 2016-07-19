@@ -1,6 +1,10 @@
 <span style="color:red;">{{error.msg}}</span>
 <form>
     <p>
+        <div ui-slider min="0" max="200" ng-model="demoVals.sliderExample1"></div>
+        <input type="text" ng-model="demoVals.sliderExample1" />
+    </p>
+    <p>
         <button ng-click="start_cluster()">Start a cluster.</button>
         <button ng-click="join_cluster()"> Join a cluster at: </button>
         <span ng-repeat="chunk in ipchunks">
