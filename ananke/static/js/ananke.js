@@ -15,7 +15,14 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
-        if (data.network) {
+        if (data.virtual) {
+            $scope.env = {"virtual":true};
+        }
+        else {
+            $scope.env = {"virtual":false};
+        }    
+            
+        if (data.network) {            
             $scope.network = true;
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
             $scope.master_url = data.ip.join('.')+":8080";

@@ -1,5 +1,6 @@
 import json
 from multiprocessing import Process
+import os
 
 import time
 
@@ -33,6 +34,8 @@ def all_the_docs():
 @app.route('/api/status')
 def status():
     result = {}
+    
+    result['virtual'] = json.loads(os.environ.get('VBOX','false'))
     
     ip = get_ip()
     if ip:

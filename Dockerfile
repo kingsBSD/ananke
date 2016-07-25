@@ -1,8 +1,4 @@
-FROM ubuntu:trusty
-
-# https://arnesund.com/2015/09/21/spark-cluster-on-openstack-with-multi-user-jupyter-notebook/
-
-#RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]') CODENAME=$(lsb_release -cs)
+FROM ubuntu:xenial
 
 RUN apt-get clean && apt-get -q -y update
 
@@ -10,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     build-essential \
     curl \
     nano \
-    openjdk-7-jdk \
+    openjdk-8-jdk \
     python-dev \
     python-pip \
     python3-dev \
@@ -19,14 +15,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
     screen \
     supervisor \
     wget 
-
-#RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \
-#    libapr1-dev \
-#    libcurl4-nss-dev \
-#    libsasl2-dev \
-#    libsasl2-modules \
-#    libsvn-dev \
-#    maven    
 
 # Packages needed to build Numpy, Sci-Kit Learn...        
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install \                
@@ -87,7 +75,8 @@ RUN jupyter notebook --generate-config
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
     net-tools \
-    nginx
+    nginx \
+    pciutils
 
 # https://github.com/Kronuz/pyScss/issues/308
 ENV LC_CTYPE C.UTF-8
@@ -110,15 +99,6 @@ ADD sites-available /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-#ENV SPARK_HOME = /spark-1.6.1-bin-hadoop2.6
-
 CMD ["/usr/bin/supervisord"]
 
-#spark-env.sh
-#export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6 
-#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-##export spark.mesos.executor.home=/spark-1.6.1-bin-hadoop2.6
 
-#spark-defaults.conf
-#spark.executor.uri http://localhost:5000/spark/spark-1.6.1-bin-hadoop2.6.tgz
-#spark.mesos.executor.home /spark-1.6.1-bin-hadoop2.6
