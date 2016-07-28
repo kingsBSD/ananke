@@ -51,7 +51,10 @@ RUN cd /sparkjars && wget http://repo1.maven.org/maven2/org/apache/commons/commo
 RUN cd /sparkjars && wget http://repo1.maven.org/maven2/com/databricks/spark-csv_2.10/1.0.0/spark-csv_2.10-1.0.0.jar
 
 RUN pip3 install jupyterhub
+RUN pip3 install jupyter
 RUN pip3 install "ipython[notebook]"
+
+RUN ipython3 kernelspec install-self
 
 RUN pip install py4j
 RUN pip install "ipython[notebook]"
