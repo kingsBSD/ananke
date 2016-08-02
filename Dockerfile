@@ -38,17 +38,22 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install nodejs
     
 RUN npm install -g configurable-http-proxy    
    
-RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
-RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
-RUN rm spark-1.6.1-bin-hadoop2.6.tgz
+#RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
+#RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
+#RUN rm spark-1.6.1-bin-hadoop2.6.tgz
+
+
+RUN wget http://mirror.catn.com/pub/apache/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.6.tgz
+RUN tar -xvzf spark-2.0.0-bin-hadoop2.6.tgz
+RUN rm spark-2.0.0-bin-hadoop2.6.tgz
 
 #RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
 #RUN tar -zxf hadoop-2.7.2.tar.gz
 #RUN rm hadoop-2.7.2.tar.gz
 
-RUN mkdir sparkjars
-RUN cd /sparkjars && wget http://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.1/commons-csv-1.1.jar
-RUN cd /sparkjars && wget http://repo1.maven.org/maven2/com/databricks/spark-csv_2.10/1.0.0/spark-csv_2.10-1.0.0.jar
+#RUN mkdir sparkjars
+#RUN cd /sparkjars && wget http://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.1/commons-csv-1.1.jar
+#RUN cd /sparkjars && wget http://repo1.maven.org/maven2/com/databricks/spark-csv_2.10/1.0.0/spark-csv_2.10-1.0.0.jar
 
 RUN pip3 install jupyterhub
 RUN pip3 install jupyter
