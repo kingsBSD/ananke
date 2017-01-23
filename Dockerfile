@@ -38,31 +38,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install nodejs
     
 RUN npm install -g configurable-http-proxy    
    
-#RUN wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
-#RUN tar -xvzf spark-1.6.1-bin-hadoop2.6.tgz
-#RUN rm spark-1.6.1-bin-hadoop2.6.tgz
+RUN wget http://apache.mirror.anlx.net/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz
+RUN tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz
+RUN rm spark-2.1.0-bin-hadoop2.7.tgz
 
-
-RUN wget http://mirror.catn.com/pub/apache/spark/spark-2.0.0/spark-2.0.0-bin-hadoop2.6.tgz
-RUN tar -xvzf spark-2.0.0-bin-hadoop2.6.tgz
-RUN rm spark-2.0.0-bin-hadoop2.6.tgz
-
-#RUN wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz
-#RUN tar -zxf hadoop-2.7.2.tar.gz
-#RUN rm hadoop-2.7.2.tar.gz
-
-#RUN mkdir sparkjars
-#RUN cd /sparkjars && wget http://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.1/commons-csv-1.1.jar
-#RUN cd /sparkjars && wget http://repo1.maven.org/maven2/com/databricks/spark-csv_2.10/1.0.0/spark-csv_2.10-1.0.0.jar
-
-RUN pip3 install jupyterhub
 RUN pip3 install jupyter
-RUN pip3 install "ipython[notebook]"
-
-RUN ipython3 kernelspec install-self
 
 RUN pip install py4j
-RUN pip install "ipython[notebook]"
 
 RUN pip3 install matplotlib
 RUN pip3 install nltk
@@ -75,11 +57,9 @@ RUN pip3 install lda
 RUN pip3 install gensim
 RUN pip3 install pyemd
 RUN pip3 install folium
+RUN pip3 installseaborn
 
 RUN python3 -m nltk.downloader punkt
-
-RUN ipython profile create pyspark
-RUN jupyter notebook --generate-config
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
     net-tools \
@@ -102,11 +82,9 @@ RUN mkdir -p /data
 
 ADD scripts /usr/local/bin
 ADD ananke /var/www/ananke
-ADD conf /spark-1.6.1-bin-hadoop2.6/conf
+ADD conf /spark-2.1.0-bin-hadoop2.7/conf
 ADD sites-available /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/usr/bin/supervisord"]
-
-
