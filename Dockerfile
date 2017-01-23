@@ -57,7 +57,7 @@ RUN pip3 install lda
 RUN pip3 install gensim
 RUN pip3 install pyemd
 RUN pip3 install folium
-RUN pip3 installseaborn
+RUN pip3 install seaborn
 
 RUN python3 -m nltk.downloader punkt
 
