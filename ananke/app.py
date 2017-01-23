@@ -104,7 +104,7 @@ def start_cluster_notebook():
             else:
                  result['error'] = "A notebook server was already started."
         else:
-            result['error'] = "Can't find the Mesos master."
+            result['error'] = "Can't find the Spark master."
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
