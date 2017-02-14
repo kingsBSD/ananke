@@ -15,13 +15,24 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
-        if (data.network) {
+        if (data.virtual) {
+            $scope.env = {"virtual":true};
+        }
+        else {
+            $scope.env = {"virtual":false};
+        }    
+            
+        if (data.network) {            
+            $scope.network = true;
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
             $scope.master_url = data.ip.join('.')+":8080";
             $scope.slave_ip = data.slave_ip;
             $scope.master_owner = data.master_owner;
             $scope.pysparknotebook = data.pysparknotebook;
         }
+        else {
+            $scope.network = false;
+        }    
         $scope.status = data.status;
     }).error(function(data, status, headers, config) {
         $scope.ipchunks = [{i:0}, {i:0}];
@@ -33,8 +44,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     auto_conn.onmessage = function(e) {
-        var msChunks = e.data.split(" ")
-        switch (parseInt(msg[msChunks[0]])) {
+        var msChunks = e.data.split(" ");
+        var ms_action = parseInt(msg[msChunks[0]]);
+        switch (ms_action) {
             case msg.master_active:
                 $scope.status = 'active'; $scope.master_owner = true; $scope.master_ip = msChunks[1]; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.slave_active:
@@ -48,7 +60,13 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.stopped_singlenode: $scope.status = 'dormant'; spinnerService.hide('wait'); $scope.$apply(); break;          
+            case msg.stopped_singlenode:
+                if ($scope.network) {
+                    $scope.status = 'dormant';
+                } else {
+                    $scope.status = 'error';
+                }
+                spinnerService.hide('wait'); $scope.$apply(); break;          
         }    
     }    
                             

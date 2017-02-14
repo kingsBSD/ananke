@@ -1,4 +1,6 @@
-export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6 
-export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.9-src.zip
-#export SPARK_MESOS_EXECUTOR_HOME=$SPARK_HOME   
+export SPARK_HOME=/spark-2.1.0-bin-hadoop2.7
+export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip
+export PYSPARK_PYTHON=/usr/bin/python3.5
+export PYSPARK_DRIVER_PYTHON=/usr/local/bin/jupyter
+export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='0.0.0.0' --NotebookApp.port=8888"
+

@@ -1,5 +1,6 @@
 import json
 from multiprocessing import Process
+import os
 
 import time
 
@@ -34,6 +35,8 @@ def all_the_docs():
 def status():
     result = {}
     
+    result['virtual'] = json.loads(os.environ.get('VBOX','false'))
+    
     ip = get_ip()
     if ip:
         result['network'] = True
@@ -45,6 +48,8 @@ def status():
             result['status'] = 'active'
         else:
             result['status'] = 'dormant'
+    else:
+        result['status'] = 'error'
             
     return json.dumps(result)
     
@@ -99,7 +104,7 @@ def start_cluster_notebook():
             else:
                  result['error'] = "A notebook server was already started."
         else:
-            result['error'] = "Can't find the Mesos master."
+            result['error'] = "Can't find the Spark master."
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
@@ -150,11 +155,11 @@ def stop_master():
 def stop_slave():
     result = {'okay':False}
     if not got_notebook():
-        if got_cluster(get_ip()):
+        if got_slave(get_ip()):
             zocket_send(msg=msg.KILLSLAVE)
             result['okay'] = True
         else:
-            result['error'] = "No Mesos slave is active."            
+            result['error'] = "No Spark slave is active."            
     else:
         result['error'] = "A notebook server is still active."
     return json.dumps(result)        

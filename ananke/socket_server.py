@@ -1,5 +1,6 @@
 
 import json
+import sys
 
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
@@ -9,6 +10,7 @@ from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 from twisted.python import log
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 
+from ipgetter import get_ip
 import msg
 from servicegetters import got_cluster, got_slave, got_notebook
 import settings
@@ -208,7 +210,10 @@ class NotificationServerFactory(WebSocketServerFactory):
                      
 if __name__ == '__main__':
 
-    import sys
+    ip = get_ip()
+
+    if not ip:
+        ip = '127.0.0.1'
 
     zf = ZmqFactory()
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
@@ -220,7 +225,7 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    ws_factory = NotificationServerFactory(pull)
+    ws_factory = NotificationServerFactory(pull,host=ip)
     ws_factory.protocol = NotificationProtocol
 
     reactor.listenTCP(settings.WEBSOCKET_PORT, ws_factory)
