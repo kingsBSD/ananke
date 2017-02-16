@@ -1,12 +1,12 @@
 <html>
     <head>
-        <link rel="shortcut icon" href="/static/favicon.ico">
-        <link rel="stylesheet" href="/static/css/jquery-ui.min.css">
-        <script src = "/static/js/jquery.js"></script>
-        <script src = "/static/js/jquery-ui.min.js"></script>
-        <script src = "/static/js/angular_min.js"></script>
-        <script src = "/static/js/angular-spinners.min.js"></script>
-        <script src = "/static/js/ananke.js"></script>
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="stylesheet" href="/css/jquery-ui.min.css">
+        <script src = "/js/jquery.js"></script>
+        <script src = "/js/jquery-ui.min.js"></script>
+        <script src = "/js/angular_min.js"></script>
+        <script src = "/js/angular-spinners.min.js"></script>
+        <script src = "/js/ananke.js"></script>
                 
         <title>Ananke: There is no cloud, only other people's computers.</title>
     </head>
@@ -15,10 +15,10 @@
     
         <aside style="float:left; width:300px">
             <div>
-                <img src='/static/img/ananke.png' />
+                <img src='/img/ananke.png' />
             </div>
             <div>
-                <img src='/static/img/Ananke_by_Platone.jpg' />
+                <img src='/img/Ananke_by_Platone.jpg' />
             </div>
             <div ng-controller='docController'>
                 Documentation for installed Python modules at the <a href="https://pypi.python.org/" target="new">Python Package Index</a>
@@ -44,13 +44,13 @@
         </section>
         
         <section ng-controller='nodeController'>
-            <spinner name="wait" img-src="/static/img/spinner.gif" register="true"></spinner>
+            <spinner name="wait" img-src="/img/spinner.gif" register="true"></spinner>
             <div ng-switch on="status">
-                <div ng-switch-when="dormant"><div ng-include src="'static/templates/dormant.html'"></div></div>
-                <div ng-switch-when="waiting"><div ng-include src="'static/templates/waiting.html'"></div></div>
-                <div ng-switch-when="active"><div ng-include src="'static/templates/active.html'"></div></div>
-                <div ng-switch-when="single"><div ng-include src="'static/templates/single.html'"></div></div>
-                <div ng-switch-when="error"><div ng-include src="'static/templates/error.html'"></div></div>
+                <div ng-switch-when="dormant"><div ng-include src="'/templates/dormant.html'"></div></div>
+                <div ng-switch-when="waiting"><div ng-include src="'/templates/waiting.html'"></div></div>
+                <div ng-switch-when="active"><div ng-include src="'/templates/active.html'"></div></div>
+                <div ng-switch-when="single"><div ng-include src="'/templates/single.html'"></div></div>
+                <div ng-switch-when="error"><div ng-include src="'/templates/error.html'"></div></div>
             </div>
         </section>
         

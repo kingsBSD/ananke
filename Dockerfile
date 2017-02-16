@@ -42,12 +42,17 @@ RUN wget http://apache.mirror.anlx.net/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2
 RUN tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz
 RUN rm spark-2.1.0-bin-hadoop2.7.tgz
 
+RUN wget http://apache.mirrors.nublue.co.uk/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+RUN tar -xvzf hadoop-2.7.3.tar.gz
+RUN rm hadoop-2.7.3.tar.gz
+
 RUN pip3 install jupyter
 
 RUN pip install py4j
 
 RUN pip3 install matplotlib
 RUN pip3 install nltk
+RUN pip3 install spacy
 RUN pip3 install numpy
 RUN pip3 install pandas        
 RUN pip3 install scipy
@@ -75,10 +80,9 @@ RUN pip3 install twisted
 RUN pip3 install autobahn
 RUN pip3 install PyZMQ
 RUN pip3 install txZMQ
-RUN pip3 install flask
+RUN pip3 install klein
 RUN pip3 install requests
 RUN pip3 install bs4
-RUN pip3 install uwsgi
 
 RUN mkdir -p /data
 

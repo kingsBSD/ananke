@@ -1,16 +1,11 @@
 
 import json
-import sys
 
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
-
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
-from twisted.python import log
-from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 
-from ipgetter import get_ip
 import msg
 from servicegetters import got_cluster, got_slave, got_notebook
 import settings
@@ -206,27 +201,34 @@ class NotificationServerFactory(WebSocketServerFactory):
         else:
             print(debug_fail)
             returnValue((failure,False))
-    
+
+#app = Klein() 
+
+#@app.route('/', methods = ['GET'])
+#def root(request):
+#    return "Hello"
+   
                      
-if __name__ == '__main__':
+#if __name__ == '__main__':
 
-    ip = get_ip()
+#    ip = get_ip()
 
-    if not ip:
-        ip = '127.0.0.1'
+#    if not ip:
+#        ip = '127.0.0.1'
 
-    zf = ZmqFactory()
-    endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
+#    zf = ZmqFactory()
+#    endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")
 
-    pull = ZmqPullConnection(zf, endpoint)
+#    pull = ZmqPullConnection(zf, endpoint)
 
-    def doPrint(*args):
-        print("message received: %r" % (args, ))
+#    def doPrint(*args):
+#        print("message received: %r" % (args, ))
 
-    log.startLogging(sys.stdout)
+#    log.startLogging(sys.stdout)
 
-    ws_factory = NotificationServerFactory(pull,host=ip)
-    ws_factory.protocol = NotificationProtocol
+#    ws_factory = NotificationServerFactory(pull,host=ip)
+#    ws_factory.protocol = NotificationProtocol
 
-    reactor.listenTCP(settings.WEBSOCKET_PORT, ws_factory)
-    reactor.run()
+#    reactor.listenTCP(settings.WEBSOCKET_PORT, ws_factory)
+#    reactor.listenTCP(8080, Site(app.resource()))
+#    reactor.run()

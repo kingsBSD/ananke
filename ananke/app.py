@@ -1,21 +1,18 @@
 import json
-from multiprocessing import Process
 import os
-
 import time
 
-from flask import Flask, request
-
+from klein import Klein
+from twisted.web.static import File
 import zmq
-
-import settings
-import msg
 
 from docgetter import get_docs
 from ipgetter import get_ip
+import msg
 from servicegetters import got_cluster, got_slave, got_notebook
+import settings
 
-app = Flask(__name__)
+app = Klein()
 
 def zocket_send(**kwargs):
     zcontext = zmq.Context()
@@ -23,16 +20,17 @@ def zocket_send(**kwargs):
     socket.bind("ipc:///tmp/sock")
     socket.send_json(kwargs)
     
-@app.route('/')
-def root():
-    return app.send_static_file('index.html')
+@app.route('/', branch=True)
+def root(request):
+    return File("./static/")
 
 @app.route('/api/getdocs')
-def all_the_docs():
+def all_the_docs(reques):
     return json.dumps({'allthedocs':get_docs()})
 
 @app.route('/api/status')
-def status():
+def status(request):
+
     result = {}
     
     result['virtual'] = json.loads(os.environ.get('VBOX','false'))
@@ -61,7 +59,7 @@ def valid_ip(ip):
         return False
     
 @app.route('/api/startcluster')
-def start_master():
+def start_master(request):
     result = {'okay':False}
     ip = get_ip()
     if not got_cluster(ip):
@@ -75,7 +73,7 @@ def start_master():
     return json.dumps(result)
 
 @app.route('/api/joincluster')
-def start_slave():
+def start_slave(request):
     result = {'okay':False}
     master_ip = request.args.get('ip', False)
     if valid_ip(master_ip):
@@ -93,7 +91,7 @@ def start_slave():
     return json.dumps(result)
 
 @app.route('/api/startclusternotebook')
-def start_cluster_notebook():
+def start_cluster_notebook(request):
     result = {'okay':False}
     ip = request.args.get('ip', False)
     if valid_ip(ip):
@@ -110,7 +108,7 @@ def start_cluster_notebook():
     return json.dumps(result)        
 
 @app.route('/api/startsinglenotebook')
-def start_single_notebook():
+def start_single_notebook(request):
     result = {'okay':False}
     if not got_notebook():
         zocket_send(msg=msg.STARTSINGLENOTEBOOK)
@@ -119,7 +117,7 @@ def start_single_notebook():
     return json.dumps(result)
 
 @app.route('/api/stopclusternotebook')
-def stop_cluster_notebook():
+def stop_cluster_notebook(request):
     result = {'okay':False}
     if got_notebook():
         zocket_send(msg=msg.KILLPYSPARKNOTEBOOK)
@@ -129,7 +127,7 @@ def stop_cluster_notebook():
     return json.dumps(result)
 
 @app.route('/api/stopsinglenotebook')
-def stop_single_notebook():
+def stop_single_notebook(request):
     result = {'okay':False}
     if got_notebook():
         zocket_send(msg=msg.KILLSINGLENOTEBOOK)
@@ -139,7 +137,7 @@ def stop_single_notebook():
     return json.dumps(result)    
 
 @app.route('/api/stopcluster')
-def stop_master():
+def stop_master(request):
     result = {'okay':False}
     if not got_notebook():
         if got_cluster(get_ip()):
@@ -164,12 +162,8 @@ def stop_slave():
         result['error'] = "A notebook server is still active."
     return json.dumps(result)        
                 
-#@app.route('/api/ping')
-#def ping():
-#    zocket_send(ping="pong")
-#    return json.dumps({'ping':'pong'})
-    
-if __name__ == '__main__':
-
-    app.run(debug=True)
+@app.route('/api/ping')
+def ping(request):
+    zocket_send(ping="pong")
+    return json.dumps({'ping':'pong'})
     
