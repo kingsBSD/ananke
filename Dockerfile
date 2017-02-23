@@ -46,6 +46,15 @@ RUN wget http://apache.mirrors.nublue.co.uk/hadoop/common/hadoop-2.7.3/hadoop-2.
 RUN tar -xvzf hadoop-2.7.3.tar.gz
 RUN rm hadoop-2.7.3.tar.gz
 
+RUN groupadd hadoop
+RUN useradd -g hadoop hadoop
+RUN mkdir -p /home/hdfs
+RUN useradd -g hadoop -d /home/hdfs hdfs
+RUN chown hdfs /home/hdfs
+RUN chown -R hadoop:hadoop /hadoop-2.7.3
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install openssh-client openssh-server
+
 RUN pip3 install jupyter
 
 RUN pip install py4j
@@ -70,11 +79,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
     net-tools \
     nginx \
     pciutils
-
-#RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''
         
 # https://github.com/Kronuz/pyScss/issues/308
 ENV LC_CTYPE C.UTF-8
+
+RUN apt-get clean && apt-get -q -y update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libssl-dev
 
 RUN pip3 install twisted
 RUN pip3 install autobahn
@@ -83,12 +93,21 @@ RUN pip3 install txZMQ
 RUN pip3 install klein
 RUN pip3 install requests
 RUN pip3 install bs4
+RUN pip3 install treq
 
 RUN mkdir -p /data
 
+RUN sed -i s/Port\\s22/Port\ 8022/ etc/ssh/sshd_config
+RUN chmod -R a+x /hadoop-2.7.3/bin
+RUN chmod -R a+x /hadoop-2.7.3/sbin
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre/
+ENV HADOOP_HOME /hadoop-2.7.3
+ENV PATH $PATH:$HADOOP_HOME/bin:$HADOOP_HOME:/sbin
+ADD hadoop_conf /hadoop-2.7.3/etc/hadoop
+
 ADD scripts /usr/local/bin
 
-ADD ananke /var/www/ananke
+COPY ananke /var/www/ananke
 ADD conf /spark-2.1.0-bin-hadoop2.7/conf
 ADD sites-available /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled

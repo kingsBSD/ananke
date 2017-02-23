@@ -6,6 +6,7 @@ from klein import Klein
 from twisted.web.static import File
 import zmq
 
+from db import Database
 from docgetter import get_docs
 from ipgetter import get_ip
 import msg
@@ -13,6 +14,7 @@ from servicegetters import got_cluster, got_slave, got_notebook
 import settings
 
 app = Klein()
+slave_db = Database()
 
 def zocket_send(**kwargs):
     zcontext = zmq.Context()
@@ -65,6 +67,7 @@ def start_master(request):
     if not got_cluster(ip):
         if not got_slave(ip):
             zocket_send(msg=msg.STARTMASTER,ip=ip)
+            slave_db.create_db()
             result = {'okay': True, 'ip':ip}
         else:
             result['error'] = "This node is already a Spark slave."
@@ -97,6 +100,7 @@ def start_cluster_notebook(request):
     if valid_ip(ip):
         if got_cluster(ip):
             if not got_notebook():
+                slave_db.purge_slaves()
                 zocket_send(msg=msg.STARTPYSPARKNOTEBOOK, ip=ip)
                 result['okay'] = True
             else:
@@ -142,6 +146,7 @@ def stop_master(request):
     if not got_notebook():
         if got_cluster(get_ip()):
             zocket_send(msg=msg.KILLMASTER)
+            slave_db.purge_slaves()
             result['okay'] = True
         else:
             result['error'] = "No Mesos master is active."            
@@ -150,7 +155,7 @@ def stop_master(request):
     return json.dumps(result)
         
 @app.route('/api/leavecluster')
-def stop_slave():
+def stop_slave(request):
     result = {'okay':False}
     if not got_notebook():
         if got_slave(get_ip()):
@@ -161,6 +166,29 @@ def stop_slave():
     else:
         result['error'] = "A notebook server is still active."
     return json.dumps(result)        
+
+@app.route('/api/reportslave', methods=['GET'])
+def report_slave(request):
+    result = {'okay':False}
+    try:
+        slave_ip = request.args.get(b'ip', False)[0].decode('utf-8')
+    except:
+        slave_ip = False
+    if valid_ip(slave_ip):
+        print("Slave reported: "+slave_ip)
+        slave_db.insert_slave(slave_ip)
+        result['okay'] = True
+    else:
+        result['error'] = 'Missing or invalid IP address.'
+    return json.dumps(result)        
+
+@app.route('/api/getslaves')
+def get_slaves(request):
+    result = {'okay':True}
+    slave_db.get_slaves().addCallback(print)
+    return json.dumps(result)
+    
+
                 
 @app.route('/api/ping')
 def ping(request):
