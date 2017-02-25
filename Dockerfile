@@ -90,7 +90,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
 ENV LC_CTYPE C.UTF-8
 
 RUN apt-get clean && apt-get -q -y update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libssl-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libssl-dev sudo
 
 RUN pip3 install twisted
 RUN pip3 install autobahn
@@ -104,7 +104,12 @@ RUN pip3 install treq
 RUN mkdir -p /data
 
 RUN sed -i s/Port\\s22/Port\ 8022/ etc/ssh/sshd_config
+# http://linuxcommando.blogspot.co.uk/2008/10/how-to-disable-ssh-host-key-checking.html
+# https://www.symantec.com/connect/articles/ssh-host-key-protection
 RUN echo "    Port 8022" >> /etc/ssh/ssh_config
+RUN echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+RUN echo "    UserKnownHostsFile=/dev/null" >> /etc/ssh/ssh_config
+
 RUN chmod -R a+x /hadoop-2.7.3/bin
 RUN chmod -R a+x /hadoop-2.7.3/sbin
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre/

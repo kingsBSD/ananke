@@ -1,8 +1,9 @@
 #!/bin/bash
 export SPARK_HOME=/spark-2.1.0-bin-hadoop2.7
-rm /home/hdfs/.ssh/hdfs_rsa
-runuser -l hdfs -c 'ssh-keygen -N anankehdfs -t rsa -f ~/.ssh/hdfs_rsa'
+rm /home/hdfs/.ssh/id_rsa*
+mkdir -p /home/hdfs/.ssh
+chown hdfs /home/hdfs/.ssh
+runuser -l hdfs -c "ssh-keygen -N '' -t rsa -f ~/.ssh/id_rsa"
 cp /home/hdfs/.ssh/id_rsa.pub /var/www/ananke/static/id_rsa.pub
 chmod a+r /var/www/ananke/static/id_rsa.pub
-#/spark-1.6.1-bin-hadoop2.6/sbin/start-master.sh -h $1
 /spark-2.1.0-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.master.Master --ip $1 --port 7077 --webui-port 8080

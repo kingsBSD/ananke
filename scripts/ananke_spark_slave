@@ -3,4 +3,7 @@ export SPARK_HOME=/spark-2.1.0-bin-hadoop2.7
 rm /home/hdfs/.ssh/authorized_keys
 wget -O /home/hdfs/.ssh/authorized_keys http://$1:5000/id_rsa.pub
 chown hdfs /home/hdfs/.ssh/authorized_keys
+chmod 700 /home/hdfs/.ssh
+chmod 600 home/hdfs/.ssh/authorized_keys
+runuser -l hdfs -c 'eval `ssh-agent -s` && ssh-add'
 /spark-2.1.0-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.worker.Worker -i $2 -p $3 spark://$1:7077

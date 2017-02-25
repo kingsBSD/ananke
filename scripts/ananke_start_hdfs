@@ -1,0 +1,5 @@
+#!/bin/bash
+ananke_hadoop_conf.py $1
+chown hdfs $HADOOP_HOME/etc/hadoop/core-site.xml 
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/bin/hdfs namenode -format
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/sbin/start-dfs.sh
