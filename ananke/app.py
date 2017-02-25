@@ -182,12 +182,17 @@ def report_slave(request):
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
 
-@app.route('/api/getslaves')
-def get_slaves(request):
+@app.route('/api/starthdfs')
+def start_hdfs(request):
     result = {'okay':True}
-    slave_db.get_slaves().addCallback(print)
+    slave_db.get_slaves().addCallback(dump_slaves)
     return json.dumps(result)
     
+def dump_slaves(slaves):
+    slave_path = os.environ['HADOOP_HOME'] + '/etc/hadoop/slaves'
+    with open(slave_path, 'w') as slave_file:
+        for s in slaves:
+            slave_file.write(s[0]+'\n')
 
                 
 @app.route('/api/ping')

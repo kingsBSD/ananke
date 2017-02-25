@@ -47,11 +47,17 @@ RUN tar -xvzf hadoop-2.7.3.tar.gz
 RUN rm hadoop-2.7.3.tar.gz
 
 RUN groupadd hadoop
-RUN useradd -g hadoop hadoop
+RUN mkdir -p /home/hadoop
+RUN useradd -g hadoop -d/home/hadoop hadoop
+RUN echo "hadoop:hadoop" | chpasswd
+RUN chown -R hadoop:hadoop /hadoop-2.7.3
+RUN chmod -R g+rw /hadoop-2.7.3/
+RUN chown hadoop /home/hadoop
+
 RUN mkdir -p /home/hdfs
 RUN useradd -g hadoop -d /home/hdfs hdfs
+RUN echo "hdfs:hdfs" | chpasswd
 RUN chown hdfs /home/hdfs
-RUN chown -R hadoop:hadoop /hadoop-2.7.3
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --fix-missing install openssh-client openssh-server
 
@@ -98,6 +104,7 @@ RUN pip3 install treq
 RUN mkdir -p /data
 
 RUN sed -i s/Port\\s22/Port\ 8022/ etc/ssh/sshd_config
+RUN echo "    Port 8022" >> /etc/ssh/ssh_config
 RUN chmod -R a+x /hadoop-2.7.3/bin
 RUN chmod -R a+x /hadoop-2.7.3/sbin
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre/

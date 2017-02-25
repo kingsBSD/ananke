@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /var/www/ananke
+python3 ananke.py
