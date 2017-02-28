@@ -22,6 +22,15 @@ def got_slave(ip):
             return False
     except:
         return False
+
+def got_hdfs(ip):
+    try:
+        if requests.get("http://"+ip+":50070",timeout=2).status_code == 200:
+            return ip
+        else:
+            return False
+    except:
+        return False
     
 def got_notebook():
     try:

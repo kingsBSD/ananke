@@ -184,15 +184,19 @@ def report_slave(request):
 
 @app.route('/api/starthdfs')
 def start_hdfs(request):
-    result = {'okay':True}
-    slave_db.get_slaves().addCallback(dump_slaves)
+    result = {'okay':False}
+    ip = get_ip()
+    if ip:        
+        slave_db.get_slaves().addCallback(dump_slaves, ip=ip)
+        result = {'okay':True}
     return json.dumps(result)
     
-def dump_slaves(slaves):
+def dump_slaves(slaves,ip=False):
     slave_path = os.environ['HADOOP_HOME'] + '/etc/hadoop/slaves'
     with open(slave_path, 'w') as slave_file:
         for s in slaves:
             slave_file.write(s[0]+'\n')
+    zocket_send(msg=msg.STARTHDFS, ip=ip, slave_count=len(slaves))                
 
                 
 @app.route('/api/ping')

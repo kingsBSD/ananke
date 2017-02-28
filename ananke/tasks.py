@@ -111,3 +111,11 @@ class SingleNode(Task):
             
     def start(self):
         return Task.run(self,"/usr/local/bin/spark_jupyter_single_node")
+    
+class NameNode(Task):
+    
+    def __init__(self):
+        Task.__init__(self)
+            
+    def start(self,ip):
+        return Task.run(self,"/usr/local/bin/ananke_start_hdfs", [ip])    

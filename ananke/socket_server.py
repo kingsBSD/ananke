@@ -8,7 +8,7 @@ from twisted.internet import reactor
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
 import msg
-from servicegetters import got_cluster, got_slave, got_notebook
+from servicegetters import got_cluster, got_slave, got_notebook, got_hdfs
 import settings
 import tasks
 
@@ -53,6 +53,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.slave = tasks.SparkSlave()
         self.pysparknb = tasks.PySparkNoteBook()
         self.snode = tasks.SingleNode()
+        self.hdfs = tasks.NameNode()
         
     def register(self,c):
         self.clients.append(c)
@@ -142,6 +143,12 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.KILLSLAVE:
             self.slave.stop()
             self.broadcast_local('stopped_sparkslave')
+            
+        if job == msg.STARTHDFS:
+            okay = yield self.start_hdfs(message['ip'],int(message['slave_count']))
+            if not okay:
+                self.broadcast_local('start_hdfs_failed')
+            
     
     @inlineCallbacks
     def wait_notebook(self,single=True):
@@ -171,10 +178,26 @@ class NotificationServerFactory(WebSocketServerFactory):
             returnValue(True)
         else:
             returnValue(False)
-                    
+        
     @inlineCallbacks  
     def wait_slave(self,ip):
         res, okay = yield self.are_we_there_yet(ip,got_slave,lambda x,ip: " ".join(["slave_active",ip]),"slave_failed","Spark slave")
+        returnValue((res,okay))
+
+    @inlineCallbacks
+    def start_hdfs(self,ip,slave_count):
+        if self.hdfs.start(ip):
+            res, okay = yield self.wait_hdfs(ip, slave_count)
+            if okay:
+                self.hdfs.confirm_started()
+            self.broadcast_local(res)
+            returnValue(True)
+        else:
+            returnValue(False)
+
+    @inlineCallbacks 
+    def wait_hdfs(self, ip, slave_count):
+        res, okay = yield self.are_we_there_yet(ip,got_hdfs,lambda x,ip: " ".join(["hdfs_active",ip]),"hdfs_failed","HDFS",max_tries=slave_count*50)
         returnValue((res,okay))
 
     @inlineCallbacks
