@@ -78,7 +78,8 @@ def start_master(request):
 @app.route('/api/joincluster')
 def start_slave(request):
     result = {'okay':False}
-    master_ip = request.args.get('ip', False)
+    master_ip = request.args.get(b'ip', False)[0].decode('utf-8')
+    print(" MASTER IP ",master_ip)
     if valid_ip(master_ip):
         slave_ip = get_ip()
         if got_cluster(master_ip):
@@ -181,6 +182,17 @@ def report_slave(request):
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
+
+@app.route('/api/writeslaves')
+def write_slaves(request):
+    slave_db.get_slaves().addCallback(export_slaves)
+    return json.dumps({'okay':True})
+
+def export_slaves(slaves):
+    slave_path = os.environ['HADOOP_HOME'] + '/etc/hadoop/slaves'
+    with open(slave_path, 'w') as slave_file:
+        for s in slaves:
+            slave_file.write(s[0]+'\n')
 
 @app.route('/api/starthdfs')
 def start_hdfs(request):
