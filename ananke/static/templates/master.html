@@ -4,15 +4,23 @@
         <p>(Give your friends its IP address and ask them to join it.)</p>
         <p ng-if="!slave_owner.active">A Spark slave should start shortly...</p>
         <p ng-if="slave_owner.active">Your Spark slave is at: <a ng-href="http://{{slave_ip}}:8081" target="new">{{slave_ip}}:8081</a>.</p>
-    </div>
+        <p ng-if="hdfs.active">The HDFS web interface is active at <a ng-href="http://{{hdfs_ip}}:50070" target="new">{{hdfs_ip}}:50070</a></p>
+</div>
+<div>       
     <div ng-if="env.virtual">
         <p>You started a <a ng-href="http://localhost:8080" target="new">Spark master</a>.</p>
         <p>(Find your local address and give it to your friends so they can join it.)</p>
         <p ng-if="!slave_owner.active">A Spark slave should start shortly...</p>
         <p ng-if="slave_owner.active">You also have a <a ng-href="http://localhost:8081" target="new">Spark slave</a>.</p>
+        <p ng-if="hdfs.active">The HDFS web interface is now <a ng-href="http://localhost:50070" target="new">active</a>.</p>
     </div>
 <div>
-
+<div>
+    <div ng-if="!hdfs.active">
+        <p ng-if="!hdfs.waiting"><button ng-click="start_hdfs()">Start HDFS.</button></p>
+        <p ng-if="hdfs.waiting">Waiting for HDFS...</p>
+    </div>
+</div>
 
 
 

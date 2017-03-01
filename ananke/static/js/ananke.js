@@ -10,9 +10,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.slave_owner = {"active":false};
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
-    
+    $scope.hdfs = {"active":false, "waiting":false};
+
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7};
+        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.virtual) {
@@ -60,6 +61,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
+            case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$apply(); break;          
             case msg.stopped_singlenode:
                 if ($scope.network) {
                     $scope.status = 'dormant';
@@ -107,7 +109,14 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             }
         }).error(function(data, status, headers, config) {});
     };
-    
+
+    $scope.start_hdfs = function() {
+        $scope.hdfs.waiting = true;
+        $http.get('api/starthdfs',{params: {}}).success(function(data, status, headers, config) {
+        }).error(function(data, status, headers, config) {});
+    };    
+        
+        
     $scope.cluster_notebook_stop = function() {
         simple_service('api/stopclusternotebook');
     };
