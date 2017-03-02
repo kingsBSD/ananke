@@ -122,7 +122,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     $scope.leave_cluster = function() {
-        $http.get('api/leave_cluster',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
+        $http.get('api/leavecluster',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
         }).error(function(data, status, headers, config) {});
     }    
     

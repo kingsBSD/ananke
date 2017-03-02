@@ -39,6 +39,6 @@ class Database(object):
         return self.dbpool.runInteraction(self._purge_slaves)    
         
     def get_slaves(self):    
-         return self.dbpool.runQuery('SELECT ip FROM slaves')   
+        return self.dbpool.runQuery('SELECT ip FROM slaves')   
         
     

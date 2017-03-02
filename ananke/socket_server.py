@@ -148,8 +148,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             self.slave.stop()
             master_ip = message['ip']
             slave_ip = get_ip()
-            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
-                params={'ip':[slave_ip], 'drop':['true'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+            req = yield self.update_slaves(master_ip, slave_ip, drop=True)
             self.broadcast_local('stopped_sparkslave')
             
         if job == msg.STARTHDFS:
@@ -187,12 +186,22 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.slave.confirm_started()
             self.broadcast_local(res)
             vbox = os.environ.get('VBOX','false')
-            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
-                params={'ip':[slave_ip], 'drop':['false'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+            #req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
+            #    params={'ip':[slave_ip], 'drop':['false'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+            req = yield self.update_slaves(master_ip, slave_ip)
             returnValue(True)
         else:
             returnValue(False)
-        
+    
+    def update_slaves(self, master_ip, slave_ip, drop=False):
+        vbox = os.environ.get('VBOX','false')
+        if drop:
+            drop_par = ['true']
+        else:
+            drop_par = ['false']
+        return treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
+            params={'ip':[slave_ip], 'drop':drop_par, 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+    
     @inlineCallbacks  
     def wait_slave(self,ip):
         res, okay = yield self.are_we_there_yet(ip,got_slave,lambda x,ip: " ".join(["slave_active",ip]),"slave_failed","Spark slave")
