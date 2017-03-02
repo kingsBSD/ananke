@@ -104,7 +104,6 @@ def start_cluster_notebook(request):
     if valid_ip(ip):
         if got_cluster(ip):
             if not got_notebook():
-                slave_db.purge_slaves()
                 zocket_send(msg=msg.STARTPYSPARKNOTEBOOK, ip=ip)
                 result['okay'] = True
             else:
@@ -150,7 +149,7 @@ def stop_master(request):
     if not got_notebook():
         if got_cluster(get_ip()):
             zocket_send(msg=msg.KILLMASTER)
-            slave_db.purge_slaves().addCallback(slave_db.count_slaves).addCallback(receive_count)
+            slave_db.purge_slaves()
             result['okay'] = True
         else:
             result['error'] = "No Mesos master is active."            

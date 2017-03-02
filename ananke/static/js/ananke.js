@@ -53,6 +53,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             var msChunks = e.data.split(" ");
             var ms_action = parseInt(msg[msChunks[0]]);
             switch (ms_action) {
+                case msg.stopped_sparkmaster:
+                $scope.status = 'dormant'; $scope.slaves = 0; $scope.$apply(); $scope.leave_cluster(); break;
                 case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
             }
         };
@@ -76,7 +78,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_pysparknotebook:
                 $scope.status = 'active'; $scope.pysparknotebook = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_sparkmaster:
-                $scope.status = 'dormant'; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
+                $scope.status = 'dormant'; $scope.slaves = 0; $scope.master_owner = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;

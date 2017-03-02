@@ -142,6 +142,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.KILLMASTER:
             self.master.stop()
             self.broadcast_local('stopped_sparkmaster')
+            self.broadcast('stopped_sparkmaster')
             self.slave.stop()
             self.broadcast_local('stopped_sparkslave')
                 
