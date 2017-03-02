@@ -21,18 +21,17 @@ class Database(object):
     def insert_slave(self, ip):
         return self.dbpool.runInteraction(self._insert_slave, ip)
 
+    def count_slaves(self, cursor):
+        return self.dbpool.runQuery('SELECT COUNT(*) FROM slaves')
+        
     def _purge_slaves(self,cursor):
         create_stmt = 'DELETE FROM slaves'
         cursor.execute(create_stmt)
 
     def purge_slaves(self):
         return self.dbpool.runInteraction(self._purge_slaves)    
-
-#    def _get_slaves(self,cursor):
-#        res = cursor.query('SELECT ip FROM SLAVES')
-#        print(res)
         
     def get_slaves(self):    
-         return self.dbpool.runQuery('SELECT ip FROM SLAVES')   
+         return self.dbpool.runQuery('SELECT ip FROM slaves')   
         
     

@@ -150,7 +150,7 @@ def stop_master(request):
     if not got_notebook():
         if got_cluster(get_ip()):
             zocket_send(msg=msg.KILLMASTER)
-            slave_db.purge_slaves()
+            slave_db.purge_slaves().addCallback(slave_db.count_slaves).addCallback(receive_count)
             result['okay'] = True
         else:
             result['error'] = "No Mesos master is active."            
@@ -183,12 +183,16 @@ def report_slave(request):
 
     if valid_ip(slave_ip):
         print("Slave reported: "+slave_ip)
-        slave_db.insert_slave(slave_ip)
+        slave_db.insert_slave(slave_ip).addCallback(slave_db.count_slaves).addCallback(receive_count)
         result['okay'] = True
     else:
         result['error'] = 'Missing or invalid IP address.'
     return json.dumps(result)        
 
+def receive_count(count):
+    slave_count = count[0][0]
+    zocket_send(msg=msg.SLAVECOUNT, count=slave_count)
+    
 @app.route('/api/writeslaves')
 def write_slaves(request):
     slave_db.get_slaves().addCallback(export_slaves)

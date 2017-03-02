@@ -11,9 +11,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
     $scope.hdfs = {"active":false, "waiting":false};
+    $scope.slaves = 0;
 
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8};
+        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8, 'slave_count':10};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.virtual) {
@@ -39,6 +40,24 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         $scope.ipchunks = [{i:0}, {i:0}];
     });
     
+    var remote_conn = false;
+    
+    get_remote_conn = function(ip) {
+        remote_conn = new WebSocket("ws://"+ip+":5001");
+        
+        remote_conn.onopen = function() {
+            auto_conn.send('remote_socket');
+        };
+        
+        remote_conn.on_message = function(e) {
+            var msChunks = e.data.split(" ");
+            var ms_action = parseInt(msg[msChunks[0]]);
+            switch (ms_action) {
+                case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
+            }
+        };
+    };    
+    
     var auto_conn = new WebSocket("ws://127.0.0.1:5001");
     auto_conn.onopen = function() {
         auto_conn.send('local_socket');
@@ -61,7 +80,8 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$apply(); break;          
+            case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$apply(); break;
+            case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
             case msg.stopped_singlenode:
                 if ($scope.network) {
                     $scope.status = 'dormant';
@@ -95,7 +115,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.error.msg = data.error;
                 $scope.status = 'dormant';
                 spinnerService.hide('wait');    
-            } 
+            } else {
+                 get_remote_conn(master_ip);
+            }    
         }).error(function(data, status, headers, config) {});
     };
     

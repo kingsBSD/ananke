@@ -1,6 +1,6 @@
 <div>
     <div ng-if="!env.virtual">
-        <p>You started a Spark master at <a ng-href="http://{{master_url}}" target="new">{{master_url}}</a>.</p>
+        <p>You started a Spark master at <a ng-href="http://{{master_url}}" target="new">{{master_url}}</a>. Slaves connected: {{slaves}}</p>
         <p>(Give your friends its IP address and ask them to join it.)</p>
         <p ng-if="!slave_owner.active">A Spark slave should start shortly...</p>
         <p ng-if="slave_owner.active">Your Spark slave is at: <a ng-href="http://{{slave_ip}}:8081" target="new">{{slave_ip}}:8081</a>.</p>
@@ -8,7 +8,7 @@
 </div>
 <div>       
     <div ng-if="env.virtual">
-        <p>You started a <a ng-href="http://localhost:8080" target="new">Spark master</a>.</p>
+        <p>You started a <a ng-href="http://localhost:8080" target="new">Spark master</a>. Slaves connected: {{slaves}}</p>
         <p>(Find your local address and give it to your friends so they can join it.)</p>
         <p ng-if="!slave_owner.active">A Spark slave should start shortly...</p>
         <p ng-if="slave_owner.active">You also have a <a ng-href="http://localhost:8081" target="new">Spark slave</a>.</p>

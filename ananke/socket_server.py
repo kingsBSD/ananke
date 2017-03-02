@@ -149,6 +149,10 @@ class NotificationServerFactory(WebSocketServerFactory):
             okay = yield self.start_hdfs(message['ip'],int(message['slave_count']))
             if not okay:
                 self.broadcast_local('start_hdfs_failed')
+                
+        if job == msg.SLAVECOUNT:
+            slave_count_ms = 'slave_count '+str(message['count'])
+            self.broadcast_local(slave_count_ms)
             
     
     @inlineCallbacks
