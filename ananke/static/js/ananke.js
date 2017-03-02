@@ -46,7 +46,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         remote_conn = new WebSocket("ws://"+ip+":5001");
         
         remote_conn.onopen = function() {
-            auto_conn.send('remote_socket');
+            remote_conn.send('remote_socket');
         };
         
         remote_conn.on_message = function(e) {
@@ -122,6 +122,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     $scope.leave_cluster = function() {
+        remote_conn.close();
         $http.get('api/leavecluster',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
         }).error(function(data, status, headers, config) {});
     }    

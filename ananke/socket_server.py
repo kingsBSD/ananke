@@ -60,15 +60,16 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.hdfs = tasks.NameNode()
         
     def register(self,c):
-        self.clients.append(c)
+        if c not in self.clients:
+            self.clients.append(c)
     
     def unregister(self, c):
-        self.clients.remove(c)
         if c in self.local_clients:
             self.local_clients.remove(c)
-        
+        if c in self.clients:
+            self.clients.remove(c)    
+                        
     def register_local(self,c):
-        
         if c not in self.local_clients:
             self.local_clients.append(c)
                      
