@@ -49,7 +49,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             remote_conn.send('remote_socket');
         };
         
-        remote_conn.on_message = function(e) {
+        remote_conn.onmessage = function(e) {
             var msChunks = e.data.split(" ");
             var ms_action = parseInt(msg[msChunks[0]]);
             switch (ms_action) {
