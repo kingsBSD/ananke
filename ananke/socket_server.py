@@ -1,5 +1,6 @@
 
 import json
+import os
 
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
@@ -174,7 +175,8 @@ class NotificationServerFactory(WebSocketServerFactory):
             if okay:
                 self.slave.confirm_started()
             self.broadcast_local(res)
-            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave', params={'ip':[slave_ip]}, headers={'Content-Type': ['application/json']})
+            vbox = os.environ.get('VBOX','false')
+            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave', params={'ip':[slave_ip],'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
             returnValue(True)
         else:
             returnValue(False)

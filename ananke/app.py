@@ -22,6 +22,9 @@ def zocket_send(**kwargs):
     socket.bind("ipc:///tmp/sock")
     socket.send_json(kwargs)
     
+def get_request_par(req,par):
+    return req.args.get(bytes(par,'utf-8'), False)[0].decode('utf-8')
+    
 @app.route('/', branch=True)
 def root(request):
     return File("./static/")
@@ -171,10 +174,13 @@ def stop_slave(request):
 @app.route('/api/reportslave', methods=['GET'])
 def report_slave(request):
     result = {'okay':False}
-    try:
-        slave_ip = request.args.get(b'ip', False)[0].decode('utf-8')
-    except:
-        slave_ip = False
+
+    virtual = get_request_par(request,'virtual')
+    if virtual == 'false':
+        slave_ip = get_request_par(request,'ip')
+    else:
+        slave_ip = request.getClientIP()
+
     if valid_ip(slave_ip):
         print("Slave reported: "+slave_ip)
         slave_db.insert_slave(slave_ip)
