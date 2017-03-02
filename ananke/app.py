@@ -81,7 +81,7 @@ def start_master(request):
 @app.route('/api/joincluster')
 def start_slave(request):
     result = {'okay':False}
-    master_ip = request.args.get(b'ip', False)[0].decode('utf-8')
+    master_ip = get_request_par(request,'ip')
     print(" MASTER IP ",master_ip)
     if valid_ip(master_ip):
         slave_ip = get_ip()
@@ -163,8 +163,12 @@ def stop_slave(request):
     result = {'okay':False}
     if not got_notebook():
         if got_slave(get_ip()):
-            zocket_send(msg=msg.KILLSLAVE)
-            result['okay'] = True
+            master_ip = get_request_par(request,'ip')
+            if master_ip:
+                zocket_send(msg=msg.KILLSLAVE, ip=master_ip)
+                result['okay'] = True
+            else:
+                result['error'] = "Missing master_ip."
         else:
             result['error'] = "No Spark slave is active."            
     else:
@@ -182,8 +186,13 @@ def report_slave(request):
         slave_ip = request.getClientIP()
 
     if valid_ip(slave_ip):
-        print("Slave reported: "+slave_ip)
-        slave_db.insert_slave(slave_ip).addCallback(slave_db.count_slaves).addCallback(receive_count)
+        drop = get_request_par(request,'drop')
+        if drop != 'true':
+            print("Slave reported: "+slave_ip)
+            slave_db.insert_slave(slave_ip).addCallback(slave_db.count_slaves).addCallback(receive_count)
+        else:
+            print("Dropping slave: "+slave_ip)
+            slave_db.drop_slave(slave_ip).addCallback(slave_db.count_slaves).addCallback(receive_count)
         result['okay'] = True
     else:
         result['error'] = 'Missing or invalid IP address.'

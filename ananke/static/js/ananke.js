@@ -121,6 +121,11 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         }).error(function(data, status, headers, config) {});
     };
     
+    $scope.leave_cluster = function() {
+        $http.get('api/leave_cluster',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
+        }).error(function(data, status, headers, config) {});
+    }    
+    
     $scope.notebook_cluster = function() {
         $scope.status = 'waiting';
         spinnerService.show('wait');
@@ -134,8 +139,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
 
     $scope.start_hdfs = function() {
         $scope.hdfs.waiting = true;
-        $http.get('api/starthdfs',{params: {}}).success(function(data, status, headers, config) {
-        }).error(function(data, status, headers, config) {});
+        simple_service('api/starthdfs');
+        //$http.get('api/starthdfs',{params: {}}).success(function(data, status, headers, config) {
+        //}).error(function(data, status, headers, config) {});
     };    
         
         
@@ -147,9 +153,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         simple_service('api/stopcluster');
     };
     
-    $scope.leave_cluster = function() {
-        simple_service('/api/leavecluster');
-    };
+    //$scope.leave_cluster = function() {
+    //    simple_service('/api/leavecluster');
+    //};
     
     $scope.start_single_node = function() {
         simple_service('/api/startsinglenotebook');

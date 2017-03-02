@@ -8,6 +8,7 @@ import treq
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
 
+from ipgetter import get_ip
 import msg
 from servicegetters import got_cluster, got_slave, got_notebook, got_hdfs
 import settings
@@ -145,6 +146,10 @@ class NotificationServerFactory(WebSocketServerFactory):
                 
         if job == msg.KILLSLAVE:
             self.slave.stop()
+            master_ip = message['ip']
+            slave_ip = get_ip()
+            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
+                params={'ip':[slave_ip], 'drop':['true'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
             self.broadcast_local('stopped_sparkslave')
             
         if job == msg.STARTHDFS:
@@ -182,7 +187,8 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.slave.confirm_started()
             self.broadcast_local(res)
             vbox = os.environ.get('VBOX','false')
-            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave', params={'ip':[slave_ip],'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+            req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
+                params={'ip':[slave_ip], 'drop':['false'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
             returnValue(True)
         else:
             returnValue(False)

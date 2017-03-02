@@ -20,6 +20,13 @@ class Database(object):
 
     def insert_slave(self, ip):
         return self.dbpool.runInteraction(self._insert_slave, ip)
+        
+    def _drop_slave(self, cursor, ip):
+        del_stmt = 'DELETE FROM slaves WHERE ip="%s"' % ip
+        cursor.execute(del_stmt)
+
+    def _drop_slave(self, ip):
+        return self.dbpool.runInteraction(self._drop_slave, ip)
 
     def count_slaves(self, cursor):
         return self.dbpool.runQuery('SELECT COUNT(*) FROM slaves')
