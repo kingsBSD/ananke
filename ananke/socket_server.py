@@ -39,8 +39,10 @@ class NotificationProtocol(WebSocketServerProtocol):
         
         if message == 'local_socket':
             self.factory.register_local(self)
-
-
+            
+        if message == 'remote_socket':
+            self.factory.register(self)
+            
 class NotificationServerFactory(WebSocketServerFactory):
     
     def __init__(self,zpull,host='127.0.0.1',port=settings.WEBSOCKET_PORT):
@@ -153,7 +155,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         if job == msg.SLAVECOUNT:
             slave_count_ms = 'slave_count '+str(message['count'])
             self.broadcast_local(slave_count_ms)
-            
+            self.broadcast(slave_count_ms)
     
     @inlineCallbacks
     def wait_notebook(self,single=True):
