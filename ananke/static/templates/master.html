@@ -17,8 +17,8 @@
 <div>
 <div>
     <div ng-if="!hdfs.active">
-        <p ng-if="!hdfs.waiting"><button ng-click="start_hdfs()">Start HDFS.</button></p>
-        <p ng-if="hdfs.waiting">Waiting for HDFS...</p>
+        <p ng-if="!hdfs.starting"><button ng-click="start_hdfs()">Start HDFS.</button></p>
+        <p ng-if="hdfs.starting">Waiting for HDFS...</p>
     </div>
 </div>
 

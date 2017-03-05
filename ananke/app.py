@@ -70,13 +70,16 @@ def start_master(request):
     if not got_cluster(ip):
         if not got_slave(ip):
             zocket_send(msg=msg.STARTMASTER,ip=ip)
-            slave_db.create_db()
+            slave_db.create_db().addCallback(post_purge)
             result = {'okay': True, 'ip':ip}
         else:
             result['error'] = "This node is already a Spark slave."
     else:
         result['error'] = "A Spark master is already running."
     return json.dumps(result)
+
+def post_purge(*args, **kwargs):
+    slave_db.purge_slaves()
 
 @app.route('/api/joincluster')
 def start_slave(request):
@@ -228,7 +231,20 @@ def dump_slaves(slaves,ip=False):
             slave_file.write(s[0]+'\n')
     zocket_send(msg=msg.STARTHDFS, ip=ip, slave_count=len(slaves))                
 
-                
+@app.route('/api/hdfsupload')
+def hdfs_upload(request):
+    result = {'okay':False}
+    name = get_request_par(request,'name')   
+    try:
+        with open('/home/hdfs/'+name, 'wb') as out:
+            out.write(request.args[b'file'][0])
+        result['okay'] = True
+    except:
+        pass
+        
+    return json.dumps(result)
+    
+
 @app.route('/api/ping')
 def ping(request):
     zocket_send(ping="pong")

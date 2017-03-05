@@ -5,6 +5,8 @@
         <script src = "/js/jquery.js"></script>
         <script src = "/js/jquery-ui.min.js"></script>
         <script src = "/js/angular_min.js"></script>
+        <script src = "/js/ng-file-upload-shim.min.js"></script>
+        <script src = "/js/ng-file-upload.min.js"></script>
         <script src = "/js/angular-spinners.min.js"></script>
         <script src = "/js/ananke.js"></script>
                 
@@ -52,7 +54,16 @@
                 <div ng-switch-when="single"><div ng-include src="'/templates/single.html'"></div></div>
                 <div ng-switch-when="error"><div ng-include src="'/templates/error.html'"></div></div>
             </div>
+            
+            <div ng-controller='uploadController'>
+                <div ng-if="upload.active">
+                    <button type="file" ngf-select="uploadFile($file, $invalidFiles)" accept="image/*" ngf-max-size="200MB">
+                        Upload a file to HDFS
+                    </button>
+                  
+                </div>
+            </div>
         </section>
-        
+               
     </body>
 </html>

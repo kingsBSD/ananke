@@ -1,4 +1,4 @@
-var mainModule = angular.module('ananke-main',['angularSpinners']);
+var mainModule = angular.module('ananke-main',['angularSpinners','ngFileUpload']);
             
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     
@@ -10,7 +10,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.slave_owner = {"active":false};
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
-    $scope.hdfs = {"active":false, "waiting":false};
+    $scope.hdfs = {"active":false, "starting":false};
     $scope.slaves = 0;
 
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
@@ -82,7 +82,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             case msg.stopped_sparkslave:
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
-            case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$apply(); break;
+            case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$broadcast('hdfsUp', true); $scope.$apply(); break;
             case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
             case msg.stopped_singlenode:
                 if ($scope.network) {
@@ -141,10 +141,12 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
 
     $scope.start_hdfs = function() {
-        $scope.hdfs.waiting = true;
-        simple_service('api/starthdfs');
-        //$http.get('api/starthdfs',{params: {}}).success(function(data, status, headers, config) {
-        //}).error(function(data, status, headers, config) {});
+        $scope.hdfs.starting = true;
+        $http.get('api/starthdfs',{params: {}}).success(function(data, status, headers, config) {
+            if (!data.okay) {
+                $scope.error.msg = data.error; 
+            }
+        }).error(function(data, status, headers, config) {});
     };    
         
         
@@ -156,9 +158,6 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         simple_service('api/stopcluster');
     };
     
-    //$scope.leave_cluster = function() {
-    //    simple_service('/api/leavecluster');
-    //};
     
     $scope.start_single_node = function() {
         simple_service('/api/startsinglenotebook');
@@ -187,6 +186,35 @@ mainModule.controller('docController',function($scope,$http) {
         $scope.allthedocs = data.allthedocs;
     }).error(function(data, status, headers, config) {
     });    
+  
+});
 
+mainModule.controller('uploadController', ['$scope','Upload', '$timeout', function ($scope, Upload, $timeout) {
+    $scope.upload = {"active":false};
     
-});    
+    $scope.$on('hdfsUp', function(event, args) {$scope.upload.active=true; $scope.$apply();});
+        
+    $scope.uploadFile = function (file, errFiles) {
+        if (file) {
+            file.upload = Upload.upload({
+                url: 'api/hdfsupload',
+                data: {file: file, name: file.name}
+            });
+            
+            file.upload.then(function (response) {
+                $timeout(function () {
+                    file.result = response.data;
+                });
+            }, function (response) {
+                if (response.status > 0)
+                    $scope.errorMsg = response.status + ': ' + response.data;
+            }, function (evt) {
+                file.progress = Math.min(100, parseInt(100.0 * 
+                                         evt.loaded / evt.total));
+            });
+            
+        }
+        
+    };
+    
+}]);
