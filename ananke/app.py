@@ -233,14 +233,14 @@ def dump_slaves(slaves,ip=False):
 
 @app.route('/api/hdfsupload')
 def hdfs_upload(request):
-    result = {'okay':False}
     name = get_request_par(request,'name')   
     try:
         with open('/home/hdfs/'+name, 'wb') as out:
             out.write(request.args[b'file'][0])
-        result['okay'] = True
+        zocket_send(msg=msg.HDFSUPLOAD, name=name)    
+        result = {'okay':True}
     except:
-        pass
+        result = {'okay':False}
         
     return json.dumps(result)
     

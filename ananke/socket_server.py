@@ -58,6 +58,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         self.pysparknb = tasks.PySparkNoteBook()
         self.snode = tasks.SingleNode()
         self.hdfs = tasks.NameNode()
+        self.uploader = tasks.HadoopUpload()
         
     def register(self,c):
         if c not in self.clients:
@@ -162,6 +163,9 @@ class NotificationServerFactory(WebSocketServerFactory):
             slave_count_ms = 'slave_count '+str(message['count'])
             self.broadcast_local(slave_count_ms)
             self.broadcast(slave_count_ms)
+    
+        if job == msg.HDFSUPLOAD:
+            self.uploader.start(message['name'])
     
     @inlineCallbacks
     def wait_notebook(self,single=True):

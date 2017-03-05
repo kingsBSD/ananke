@@ -1,0 +1,3 @@
+#!/bin/bash
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/bin/hadoop fs -copyFromLocal /home/hdfs/$1 /$1
+rm /home/hdfs/$1
