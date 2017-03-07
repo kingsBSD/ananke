@@ -83,8 +83,9 @@ RUN python3 -m nltk.downloader punkt
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install libzmq3-dev \
     net-tools \
-    nginx \
     pciutils
+        
+#RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y install nginx 
         
 # https://github.com/Kronuz/pyScss/issues/308
 ENV LC_CTYPE C.UTF-8
@@ -123,8 +124,9 @@ COPY ananke /var/www/ananke
 ADD conf /spark-2.1.0-bin-hadoop2.7/conf
 RUN mkdir -p /root/.jupyter
 COPY jupyter_conf /root/.jupyter
-ADD sites-available /etc/nginx/sites-available
-RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
+#ADD sites-available /etc/nginx/sites-available
+#RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
+RUN mkdir -p /var/run/sshd
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/usr/bin/supervisord"]

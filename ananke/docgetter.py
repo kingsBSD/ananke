@@ -9,6 +9,6 @@ def render_doc(doc):
         'local':"http://localhost:9000/"+doc.project_name.lower()+'.html'}
 
 def get_docs():
-    return [render_doc(doc) for doc in pip.get_installed_distributions()]
+    return [render_doc(doc) for doc in sorted(pip.get_installed_distributions())]
 
     

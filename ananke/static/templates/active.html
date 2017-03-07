@@ -4,14 +4,14 @@
 </div>
 <div ng-switch on="pysparknotebook"> 
     <div ng-switch-when="false">
-        <button ng-click="notebook_cluster()">Start a Jupyter notebook on PySpark.</button>
+        <p><button ng-click="notebook_cluster()">Start a Jupyter notebook on PySpark.</button></p>
         <div ng-switch on="master_owner">
-            <div ng-switch-when="true"><button ng-click="stop_cluster()">Stop the cluster.</button></div>
-            <div ng-switch-when="false"><button ng-click="leave_cluster()">Leave the cluster.</button></div>
+            <div ng-switch-when="true"><p><button ng-click="stop_cluster()">Stop the cluster.</button></p></div>
+            <div ng-switch-when="false"><p><button ng-click="leave_cluster()">Leave the cluster.</button></p></div>
         </div>
     </div>
     <div ng-switch-when="true">
         <p>A Jupyter notebook server is now running at <a href="http://localhost:8888" target="new">localhost:8888</a>.</p>
-        <button ng-click="cluster_notebook_stop()">Stop the notebook server.</button>
+        <p><button ng-click="cluster_notebook_stop()">Stop the notebook server.</button></p>
     </div>    
 </div>
