@@ -1,7 +1,8 @@
 #!/bin/bash
+export PYSPARK_PYTHON=/usr/bin/python3.5
+export PYSPARK_DRIVER_PYTHON=/usr/local/bin/jupyter
 cd /data
-#IPYTHON=1 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser --notebook-dir='/data'" /spark-1.6.1-bin-hadoop2.6/bin/pyspark --jars /sparkjars/commons-csv-1.1.jar,/sparkjars/spark-csv_2.10-1.0.0.jar 
-IPYTHON=1 PYSPARK_PYTHON=/usr/bin/python3.5 IPYTHON_OPTS="notebook --port 8888 --ip=0.0.0.0 --no-browser --notebook-dir='/data'" /spark-2.1.0-bin-hadoop2.7/bin/pyspark
+/spark-2.1.0-bin-hadoop2.7/bin/pyspark
 
 
 

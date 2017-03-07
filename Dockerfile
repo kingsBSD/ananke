@@ -121,6 +121,8 @@ ADD scripts /usr/local/bin
 
 COPY ananke /var/www/ananke
 ADD conf /spark-2.1.0-bin-hadoop2.7/conf
+RUN mkdir -p /root/.jupyter
+COPY jupyter_conf /root/.jupyter
 ADD sites-available /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/ananke /etc/nginx/sites-enabled
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

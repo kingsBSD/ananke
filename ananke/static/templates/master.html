@@ -20,6 +20,10 @@
         <p ng-if="!hdfs.starting"><button ng-click="start_hdfs()">Start HDFS.</button></p>
         <p ng-if="hdfs.starting">Waiting for HDFS...</p>
     </div>
+    <div ng-if="hdfs.active">
+         <p><button ng-click="stop_hdfs()">Stop HDFS.</button></p>
+    </div>
+    <div ng-include src="'/templates/upload.html'">
 </div>
 
 

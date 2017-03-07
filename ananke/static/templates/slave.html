@@ -7,7 +7,8 @@
     <div ng-if="env.virtual">
         <p ng-if="slave_owner.active">Your started a <a ng-href="http://localhost:8081" target="new">Spark slave</a>. Slaves connected: {{slaves}}</p>
         <p ng-if="hdfs.active">The HDFS web interface is active at <a ng-href="http://{{hdfs_ip}}:50070" target="new">{{hdfs_ip}}:50070</a></p>
-    </div>    
+    </div>
+    <div ng-include src="'/templates/upload.html'">
 </div>
 
 

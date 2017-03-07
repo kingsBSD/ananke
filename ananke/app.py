@@ -103,7 +103,7 @@ def start_slave(request):
 @app.route('/api/startclusternotebook')
 def start_cluster_notebook(request):
     result = {'okay':False}
-    ip = request.args.get('ip', False)
+    ip = get_request_par(request,'ip')
     if valid_ip(ip):
         if got_cluster(ip):
             if not got_notebook():
