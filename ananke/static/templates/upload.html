@@ -1,0 +1,7 @@
+<div ng-controller='uploadController'>
+    <div ng-if="upload.active">
+        <button type="file" ngf-select="uploadFile($file, $invalidFiles)" accept="image/*" ngf-max-size="200MB">
+            Upload a file to HDFS
+        </button>          
+    </div>
+</div>
