@@ -14,7 +14,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     $scope.slaves = 0;
 
     var msg = {'master_active':0, 'slave_active':1, 'notebook_active':2, 'stopped_pysparknotebook':3,
-        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8, 'slave_count':10};
+        'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8, 'stopped_hdfs':9, 'slave_count':10};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
         if (data.virtual) {
@@ -83,6 +83,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'dormant'; $scope.slave_owner.active = false; $scope.slave_ip = false; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.node_active: $scope.status = "single"; spinnerService.hide('wait'); $scope.$apply(); break;
             case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$broadcast('hdfsUp', true); $scope.$apply(); break;
+            case msg.stopped_hdfs: $scope.hdfs.active = false; $scope.hdfs.starting = false; $scope.$broadcast('hdfsDown', true); $scope.$apply(); break;        
             case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
             case msg.stopped_singlenode:
                 if ($scope.network) {
@@ -149,7 +150,14 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         }).error(function(data, status, headers, config) {});
     };    
         
-        
+     $scope.stop_hdfs = function() {
+         $http.get('api/stophdfs',{params: {}}).success(function(data, status, headers, config) {
+            if (!data.okay) {
+                $scope.error.msg = data.error; 
+            }
+        }).error(function(data, status, headers, config) {});
+     };
+    
     $scope.cluster_notebook_stop = function() {
         simple_service('api/stopclusternotebook');
     };
@@ -193,6 +201,7 @@ mainModule.controller('uploadController', ['$scope','Upload', '$timeout', functi
     $scope.upload = {"active":false};
     
     $scope.$on('hdfsUp', function(event, args) {$scope.upload.active=true; $scope.$apply();});
+    $scope.$on('hdfsDown', function(event, args) {$scope.upload.active=false; $scope.$apply();});
         
     $scope.uploadFile = function (file, errFiles) {
         if (file) {

@@ -231,6 +231,11 @@ def dump_slaves(slaves,ip=False):
             slave_file.write(s[0]+'\n')
     zocket_send(msg=msg.STARTHDFS, ip=ip, slave_count=len(slaves))                
 
+@app.route('/api/stophdfs')
+def stop_hdfs(request):
+    zocket_send(msg=msg.STOPHDFS)
+    return json.dumps({'okay':True})
+
 @app.route('/api/hdfsupload')
 def hdfs_upload(request):
     name = get_request_par(request,'name')   

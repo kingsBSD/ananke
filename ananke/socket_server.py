@@ -146,6 +146,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             self.broadcast('stopped_sparkmaster')
             self.slave.stop()
             self.broadcast_local('stopped_sparkslave')
+            self.stop_hdfs()
                 
         if job == msg.KILLSLAVE:
             self.slave.stop()
@@ -159,6 +160,9 @@ class NotificationServerFactory(WebSocketServerFactory):
             if not okay:
                 self.broadcast_local('start_hdfs_failed')
                 
+        if job == msg.STOPHDFS:
+            self.stop_hdfs()
+                
         if job == msg.SLAVECOUNT:
             slave_count_ms = 'slave_count '+str(message['count'])
             self.broadcast_local(slave_count_ms)
@@ -166,6 +170,11 @@ class NotificationServerFactory(WebSocketServerFactory):
     
         if job == msg.HDFSUPLOAD:
             self.uploader.start(message['name'])
+    
+    def stop_hdfs(self):
+        self.hdfs.stop()
+        self.broadcast_local('stopped_hdfs')
+        self.broadcast('stopped_hdfs')
     
     @inlineCallbacks
     def wait_notebook(self,single=True):

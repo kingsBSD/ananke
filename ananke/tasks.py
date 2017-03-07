@@ -120,6 +120,12 @@ class NameNode(Task):
     def start(self,ip):
         return Task.run(self,"/usr/local/bin/ananke_start_hdfs", [ip])    
 
+    def stop(self):
+        self.running = False
+        self.starting = False
+        self.stopping = False
+        return Task.run(self,"/usr/local/bin/ananke_stop_hdfs")    
+
 class HadoopUpload(Task):
     
     def __init__(self):

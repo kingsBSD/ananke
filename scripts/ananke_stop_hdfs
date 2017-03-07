@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/sbin/stop-dfs.sh
