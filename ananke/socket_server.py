@@ -224,7 +224,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             slave_ip = get_ip()
             
         return treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
-            params={'ip':[slave_ip], 'drop':drop_par, headers={'Content-Type': ['application/json']})
+            params={'ip':[slave_ip], 'drop':drop_par}, headers={'Content-Type': ['application/json']})
     
     @inlineCallbacks  
     def wait_slave(self,ip):
