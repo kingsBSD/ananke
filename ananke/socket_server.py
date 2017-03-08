@@ -207,7 +207,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             returnValue(False)
     
     def update_slaves(self, master_ip, slave_ip, drop=False):
-        vbox = os.environ.get('VBOX','false') == 'True'
+        vbox = os.environ.get('VBOX','false') == 'true'
         
         if drop:
             drop_par = ['true']

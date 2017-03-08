@@ -30,6 +30,9 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             $scope.network = true;
             $scope.app_id = data.appid;
             $scope.ip.real = data.realip;
+            if (data.realip {
+                $scope.ip.real = data.ext_ip;
+            )
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
             $scope.master_url = data.ip.join('.')+":8080";
             $scope.slave_ip = data.slave_ip;
