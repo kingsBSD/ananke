@@ -22,7 +22,7 @@ if __name__ == '__main__':
         ip = '127.0.0.1'
 
     random_id = ''.join([random.choice(string.hexdigits) for i in range(24)])
-    with open('/var/www/ananke/static/id.json', 'w') as idfile:
+    with open('id.json', 'w') as idfile:
         idfile.write(json.dumps({'id':random_id}))
         
     zf = ZmqFactory()

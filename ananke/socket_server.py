@@ -201,21 +201,30 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.slave.confirm_started()
             self.broadcast_local(res)
             vbox = os.environ.get('VBOX','false')
-            #req = yield treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
-            #    params={'ip':[slave_ip], 'drop':['false'], 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
             req = yield self.update_slaves(master_ip, slave_ip)
             returnValue(True)
         else:
             returnValue(False)
     
     def update_slaves(self, master_ip, slave_ip, drop=False):
-        vbox = os.environ.get('VBOX','false')
+        vbox = os.environ.get('VBOX','false') == 'True'
+        
         if drop:
             drop_par = ['true']
         else:
             drop_par = ['false']
+        
+        if vbox:
+            try:
+                with open('ip.json', 'r') as ipfile:
+                    slave_ip = json.loads(ipfile.read())['ip']
+            except:
+                slave_ip = '127.0.0.1'
+        else:
+            slave_ip = get_ip()
+            
         return treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
-            params={'ip':[slave_ip], 'drop':drop_par, 'virtual':[vbox]}, headers={'Content-Type': ['application/json']})
+            params={'ip':[slave_ip], 'drop':drop_par, headers={'Content-Type': ['application/json']})
     
     @inlineCallbacks  
     def wait_slave(self,ip):
