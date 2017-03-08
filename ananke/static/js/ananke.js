@@ -30,7 +30,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             $scope.network = true;
             $scope.app_id = data.appid;
             $scope.ip.real = data.realip;
-            if (data.realip {
+            if (data.realip) {
                 $scope.ip.real = data.ext_ip;
             )
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
