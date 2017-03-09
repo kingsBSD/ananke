@@ -43,6 +43,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
             $scope.network = false;
         }    
         $scope.status = data.status;
+        $scope.apply();
     }).error(function(data, status, headers, config) {
         $scope.ipchunks = [{i:0}, {i:0}];
     });
