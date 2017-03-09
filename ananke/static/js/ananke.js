@@ -67,7 +67,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         };
     };    
     
-    var auto_conn = new WebSocket("ws://127.0.0.1:5001");
+    var auto_conn = false
+    
+    get_local_conn = function(ip) {
+        auto_conn = new WebSocket("ws://"+ip+":5001");
     auto_conn.onopen = function() {
         auto_conn.send('local_socket');
     };
@@ -108,6 +111,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         $http.jsonp("http://"+trial_ip+":5000/api/testip?callback=JSON_CALLBACK"+params).success(function(data) {
             if (data.okay) {
                 $scope.ip.real = true;
+                get_local_conn(trial_ip);
                 $scope.ip.value = trial_ip;
                 $scope.$apply();
             }    
