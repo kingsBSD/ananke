@@ -47,6 +47,7 @@ def status(request):
             result['realip'] = True
         except:
             result['realip'] = False
+            result['ext_ip'] = ip
     else:
         result['realip'] = True
               
