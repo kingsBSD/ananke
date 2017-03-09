@@ -36,6 +36,8 @@ def all_the_docs(reques):
 @app.route('/api/status')
 def status(request):
 
+    ip = get_ip()
+
     result = {}
     
     result['virtual'] = os.environ.get('VBOX','false') == 'true'
@@ -54,7 +56,7 @@ def status(request):
     with open('id.json', 'r') as idfile:
         result['appid'] = json.loads(idfile.read())['id']
         
-    ip = get_ip()
+
     if ip:
         result['network'] = True
         result['ip'] = ip.split('.')
