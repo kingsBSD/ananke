@@ -38,7 +38,7 @@ def status(request):
 
     result = {}
     
-    result['virtual'] = json.loads(os.environ.get('VBOX','false')) == 'true'
+    result['virtual'] = os.environ.get('VBOX','false') == 'true'
         
     if result['virtual']:
         try:
@@ -99,16 +99,7 @@ def test_ip(request):
 @app.route('/api/startcluster')
 def start_master(request):
     result = {'okay':False}
-    vbox = os.environ.get('VBOX','false')
-    if vbox == 'false':
-        ip = get_ip()
-    else:
-        try:
-            with open('ip.json', 'r') as ipfile:
-                ip = json.loads(ipfile.read())['ip']
-        except:
-            ip = '127.0.0.1'
-            
+    ip = get_ip()            
     if not got_cluster(ip):
         if not got_slave(ip):
             zocket_send(msg=msg.STARTMASTER,ip=ip)
