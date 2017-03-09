@@ -11,7 +11,10 @@
         </div>
     </div>
     <div ng-switch-when="true">
-        <p>A Jupyter notebook server is now running at <a href="http://localhost:8888" target="new">localhost:8888</a>.</p>
+        <p ng-if="!ip.real">A Jupyter notebook server is now running at <a href="http://localhost:8888" target="new">localhost:8888</a>.</p>
+        <p ng-if="ip.real">A Jupyter notebook server is now running at <a href="http://{{ip.value}}:8888" target="new">{{ip.value}}:8888</a>.</p>
         <p><button ng-click="cluster_notebook_stop()">Stop the notebook server.</button></p>
     </div>    
 </div>
+
+
