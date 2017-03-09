@@ -45,7 +45,7 @@ def status(request):
     if result['virtual']:
         try:
             with open('ip.json', 'r') as ipfile:
-                result['ext_ip'] = json.loads(ipfile.read())['ip'].split('.')
+                result['ext_ip'] = json.loads(ipfile.read())['ip']
             result['realip'] = True
         except:
             result['realip'] = False
