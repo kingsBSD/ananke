@@ -22,4 +22,8 @@
         <value>1</value> 
         <description>Block Replication</description> 
     </property>
+    <property>
+        <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+        <value>false</value>
+    </property>
 </configuration>
