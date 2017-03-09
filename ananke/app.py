@@ -48,7 +48,7 @@ def status(request):
         except:
             result['realip'] = False
     else:
-        result['realip'] = False
+        result['realip'] = True
               
     with open('id.json', 'r') as idfile:
         result['appid'] = json.loads(idfile.read())['id']
