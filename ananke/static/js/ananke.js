@@ -72,7 +72,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     var auto_conn = false;
     
     get_auto_conn = function(ip) {
-        auto_conn =  WebSocket("ws://"+ip+":5001");
+        auto_conn =  new WebSocket("ws://"+ip+":5001");
         auto_conn.onopen = function() {
             auto_conn.send('local_socket');
         };
