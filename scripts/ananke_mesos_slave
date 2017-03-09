@@ -1,6 +1,0 @@
-#!/bin/bash
-#export SPARK_EXECUTOR_URI=http://localhost:5000/spark/spark-1.6.1-bin-hadoop2.6.tgz
-#export SPARK_HOME=/spark-1.6.1-bin-hadoop2.6
-#export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-/mesos-0.28.1/build/bin/mesos-slave.sh --master=$1:5050 --launcher=posix --advertise_ip=$2 --advertise_port=$3 --work_dir=/var/lib/mesosslave --log_dir=/var/log/mesosslave
-
