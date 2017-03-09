@@ -100,14 +100,14 @@ def test_ip(request):
 def start_master(request):
     result = {'okay':False}
     vbox = os.environ.get('VBOX','false')
-        if vbox == 'false':
-            ip = get_ip()
-        else:
-            try:
-                with open('ip.json', 'r') as ipfile:
-                    ip = json.loads(ipfile.read())['ip']
-                except:
-                    ip = '127.0.0.1'
+    if vbox == 'false':
+        ip = get_ip()
+    else:
+        try:
+            with open('ip.json', 'r') as ipfile:
+                ip = json.loads(ipfile.read())['ip']
+        except:
+            ip = '127.0.0.1'
             
     if not got_cluster(ip):
         if not got_slave(ip):
