@@ -59,12 +59,10 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         };
     };    
     
-    var auto_conn = new WebSocket("ws://127.0.0.1:5001");
+    var auto_conn = new WebSocket("ws://"+window.location.hostname+":5001");
     auto_conn.onopen = function() {
         auto_conn.send('local_socket');
     };
-
-    
 
     auto_conn.onmessage = function(e) {
         var msChunks = e.data.split(" ");
