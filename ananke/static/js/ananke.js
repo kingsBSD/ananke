@@ -65,6 +65,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 $scope.status = 'dormant'; $scope.slaves = 0; $scope.$apply(); $scope.leave_cluster(); break;
                 case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
                 case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$broadcast('hdfsUp', true); $scope.$apply(); break;
+                case msg.stopped_hdfs: $scope.hdfs.active = false; $scope.hdfs.starting = false; $scope.$broadcast('hdfsDown', true); $scope.$apply(); break;       
             }
         };
     };    
@@ -135,7 +136,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
     
     $scope.leave_cluster = function() {
-        remote_conn.close();
+        //remote_conn.close();
         $http.get('api/leavecluster',{params: {'ip':$scope.master_ip}}).success(function(data, status, headers, config) {
         }).error(function(data, status, headers, config) {});
     }    
