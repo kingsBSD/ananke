@@ -6,4 +6,5 @@ chown hdfs /home/hdfs/.ssh
 runuser -l hdfs -c "ssh-keygen -N '' -t rsa -f ~/.ssh/id_rsa"
 cp /home/hdfs/.ssh/id_rsa.pub /var/www/ananke/static/id_rsa.pub
 chmod a+r /var/www/ananke/static/id_rsa.pub
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/bin/hdfs namenode -format -nonInteractive -force
 /spark-2.1.0-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.master.Master --ip $1 --port 7077 --webui-port 8080
