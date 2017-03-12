@@ -40,25 +40,9 @@ def status(request):
 
     result = {}
     
-    #result['virtual'] = os.environ.get('VBOX','false') == 'true'
-        
-    #if result['virtual']:
-    #    try:
-    #        with open('ip.json', 'r') as ipfile:
-    #            result['ext_ip'] = json.loads(ipfile.read())['ip']
-    #        result['realip'] = True
-    #    except:
-    #        result['realip'] = False
-    #        result['ext_ip'] = ip
-    #else:
-    #    result['realip'] = True
-              
-    #with open('id.json', 'r') as idfile:
-    #    result['appid'] = json.loads(idfile.read())['id']
-        
-
     if ip:
         result['network'] = True
+        result['ext_ip'] = ip
         result['ip'] = ip.split('.')
         result['slave_ip'] = got_slave(ip)
         result['master_owner'] = got_cluster(ip)
