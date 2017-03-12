@@ -3,7 +3,7 @@ var mainModule = angular.module('ananke-main',['angularSpinners','ngFileUpload']
 mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     
     $scope.status = "dormant";
-    $scope.ip = {'real':false, 'value':'127.0.0.1'};
+    $scope.ip = {'value':'127.0.0.1'};
     $scope.app_id = false;
     $scope.chunk3 = {};
     $scope.chunk4 = {};
@@ -19,21 +19,11 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         'stopped_sparkmaster':4, 'stopped_sparkslave':5, 'node_active':6, 'stopped_singlenode':7, 'hdfs_active':8, 'stopped_hdfs':9, 'slave_count':10};
     
     $http.get('api/status',{params: {}}).success(function(data, status, headers, config) {
-        if (data.virtual) {
-            $scope.env = {"virtual":true};
-        }
-        else {
-            $scope.env = {"virtual":false};
-        }    
-            
+              
         if (data.network) {            
             $scope.network = true;
             $scope.app_id = data.appid;
-            $scope.ip.real = data.realip;
-            if (data.realip) {
-                $scope.ip.real = true;
-                $scope.ip.value = data.ext_ip;
-            };
+            $scope.ip.value = data.ext_ip;
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
             $scope.master_url = data.ip.join('.')+":8080";
             $scope.slave_ip = data.slave_ip;
@@ -75,7 +65,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     };
 
     
-    
+
     auto_conn.onmessage = function(e) {
         var msChunks = e.data.split(" ");
         var ms_action = parseInt(msg[msChunks[0]]);
@@ -106,17 +96,6 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
         }    
     }    
                             
-    $scope.test_ip = function() {
-        var trial_ip = ([$scope.ipchunks[0].i, $scope.ipchunks[1].i, $scope.chunk3.i, $scope.chunk4.i]).join('.');
-        var params =  '&ip='+trial_ip+'&id='+$scope.app_id;
-        $http.jsonp("http://"+trial_ip+":5000/api/testip?callback=JSON_CALLBACK"+params).success(function(data) {
-            if (data.okay) {
-                $scope.ip.real = true;
-                $scope.ip.value = trial_ip;
-            }    
-        });
-        
-    };    
                             
     $scope.start_cluster = function() {
         $scope.status = 'waiting';

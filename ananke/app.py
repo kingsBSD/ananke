@@ -40,21 +40,21 @@ def status(request):
 
     result = {}
     
-    result['virtual'] = os.environ.get('VBOX','false') == 'true'
+    #result['virtual'] = os.environ.get('VBOX','false') == 'true'
         
-    if result['virtual']:
-        try:
-            with open('ip.json', 'r') as ipfile:
-                result['ext_ip'] = json.loads(ipfile.read())['ip']
-            result['realip'] = True
-        except:
-            result['realip'] = False
-            result['ext_ip'] = ip
-    else:
-        result['realip'] = True
+    #if result['virtual']:
+    #    try:
+    #        with open('ip.json', 'r') as ipfile:
+    #            result['ext_ip'] = json.loads(ipfile.read())['ip']
+    #        result['realip'] = True
+    #    except:
+    #        result['realip'] = False
+    #        result['ext_ip'] = ip
+    #else:
+    #    result['realip'] = True
               
-    with open('id.json', 'r') as idfile:
-        result['appid'] = json.loads(idfile.read())['id']
+    #with open('id.json', 'r') as idfile:
+    #    result['appid'] = json.loads(idfile.read())['id']
         
 
     if ip:
@@ -78,26 +78,6 @@ def valid_ip(ip):
         return len(chunks) == 4 and all([c.isnumeric and 0 <= int(c) <= 255 for c in chunks])
     except:
         return False
-
-@app.route('/api/testip')
-def test_ip(request):
-    result = {'okay':False}
-    try:
-        external_ip = get_request_par(request,'ip')
-    except:
-        external_ip = False
-    with open('id.json', 'r') as idfile:
-        true_id = json.loads(idfile.read())['id']
-    try:    
-        app_id = get_request_par(request,'id')
-    except:
-        add_id = False
-    if app_id == true_id:
-        result = {'okay':True}
-        with open('ip.json', 'w') as ipfile:
-            ipfile.write(json.dumps({'ip':external_ip}))
-    callback = get_request_par(request,'callback')
-    return callback+'('+json.dumps(result)+');'    
     
 @app.route('/api/startcluster')
 def start_master(request):
@@ -123,11 +103,7 @@ def start_slave(request):
     master_ip = get_request_par(request,'ip')
     print(" MASTER IP ",master_ip)
     if valid_ip(master_ip):
-        vbox = os.environ.get('VBOX','false')
-        if vbox == 'false':
-            slave_ip = get_ip()
-        else:
-            slave_ip = '127.0.0.1'
+        slave_ip = get_ip()
         if got_cluster(master_ip):
             if not got_slave(slave_ip):
                 zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=slave_ip)

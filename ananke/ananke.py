@@ -17,13 +17,6 @@ from socket_server import  NotificationServerFactory, NotificationProtocol
 if __name__ == '__main__':
 
     ip = get_ip()
-
-    if not ip:
-        ip = '127.0.0.1'
-
-    random_id = ''.join([random.choice(string.hexdigits) for i in range(24)])
-    with open('id.json', 'w') as idfile:
-        idfile.write(json.dumps({'id':random_id}))
         
     zf = ZmqFactory()
     endpoint = ZmqEndpoint("connect", "ipc:///tmp/sock")

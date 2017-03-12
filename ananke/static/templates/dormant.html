@@ -1,13 +1,10 @@
 <span style="color:red;">{{error.msg}}</span>
 <form>
     <p>
-        <span ng-if="ip.real">
+        <span>
             <button ng-click="start_cluster()">Start a cluster.</button>
             <button ng-click="join_cluster()"> Join a cluster at: </button>
         </span>
-        <span ng-if="!ip.real">
-            Before you can start or join a cluster, you must confirm your ip address. <button ng-click="test_ip()">Test</button>
-        </span> 
         <span ng-repeat="chunk in ipchunks">
             <input size="3" ng-model='chunk.i'>.
         </span>

@@ -200,7 +200,6 @@ class NotificationServerFactory(WebSocketServerFactory):
             if okay:
                 self.slave.confirm_started()
             self.broadcast_local(res)
-            vbox = os.environ.get('VBOX','false')
             req = yield self.update_slaves(master_ip, slave_ip)
             returnValue(True)
         else:
@@ -214,14 +213,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         else:
             drop_par = ['false']
         
-        if vbox:
-            try:
-                with open('ip.json', 'r') as ipfile:
-                    slave_ip = json.loads(ipfile.read())['ip']
-            except:
-                slave_ip = '127.0.0.1'
-        else:
-            slave_ip = get_ip()
+        slave_ip = get_ip()
             
         return treq.get('http://'+master_ip+':'+str(settings.APP_PORT)+'/api/reportslave',
             params={'ip':[slave_ip], 'drop':drop_par}, headers={'Content-Type': ['application/json']})
