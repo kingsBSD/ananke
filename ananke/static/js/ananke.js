@@ -55,6 +55,7 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
                 case msg.stopped_sparkmaster:
                 $scope.status = 'dormant'; $scope.slaves = 0; $scope.$apply(); $scope.leave_cluster(); break;
                 case msg.slave_count: $scope.slaves = msChunks[1]; $scope.$apply(); break;
+                case msg.hdfs_active: $scope.hdfs.active = true; $scope.hdfs.waiting=false; $scope.hdfs_ip = msChunks[1]; $scope.$broadcast('hdfsUp', true); $scope.$apply(); break;
             }
         };
     };    

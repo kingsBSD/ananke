@@ -206,7 +206,6 @@ class NotificationServerFactory(WebSocketServerFactory):
             returnValue(False)
     
     def update_slaves(self, master_ip, slave_ip, drop=False):
-        vbox = os.environ.get('VBOX','false') == 'true'
         
         if drop:
             drop_par = ['true']
@@ -230,6 +229,7 @@ class NotificationServerFactory(WebSocketServerFactory):
             if okay:
                 self.hdfs.confirm_started()
             self.broadcast_local(res)
+            self.broadcast(res)
             returnValue(True)
         else:
             returnValue(False)
