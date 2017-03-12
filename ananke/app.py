@@ -10,7 +10,7 @@ from db import Database
 from docgetter import get_docs
 from ipgetter import get_ip
 import msg
-from servicegetters import got_cluster, got_slave, got_notebook
+from servicegetters import got_cluster, got_slave, got_notebook,  got_hdfs
 import settings
 
 app = Klein()
@@ -23,7 +23,10 @@ def zocket_send(**kwargs):
     socket.send_json(kwargs)
     
 def get_request_par(req,par):
-    return req.args.get(bytes(par,'utf-8'), False)[0].decode('utf-8')
+    try:
+        return req.args.get(bytes(par,'utf-8'), [False])[0].decode('utf-8')
+    except:
+        return False
     
 @app.route('/', branch=True)
 def root(request):
@@ -44,8 +47,16 @@ def status(request):
         result['network'] = True
         result['ext_ip'] = ip
         result['ip'] = ip.split('.')
-        result['slave_ip'] = got_slave(ip)
-        result['master_owner'] = got_cluster(ip)
+        if got_slave(ip):
+            result['slave_ip'] = ip
+        else:
+            result['slave_ip'] = False
+        got_master = got_cluster(ip)
+        if got_master:
+            result['master_owner'] = True
+            result['got_hdfs'] = got_hdfs(ip)
+        else:
+             result['master_owner'] = False
         result['pysparknotebook'] = got_notebook()
         if result['master_owner'] or result['slave_ip']:
             result['status'] = 'active'

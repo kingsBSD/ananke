@@ -4,11 +4,11 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
     
     $scope.status = "dormant";
     $scope.ip = {'value':'127.0.0.1'};
-    $scope.app_id = false;
     $scope.chunk3 = {};
     $scope.chunk4 = {};
     $scope.error = {};
     $scope.slave_ip = false;
+    $scope.master_ip = false;
     $scope.slave_owner = {"active":false};
     $scope.master_owner = false;
     $scope.pysparknotebook = false;
@@ -22,12 +22,21 @@ mainModule.controller('nodeController',function($scope,$http,spinnerService) {
               
         if (data.network) {            
             $scope.network = true;
-            $scope.app_id = data.appid;
             $scope.ip.value = data.ext_ip;
             $scope.ipchunks = [{i:data.ip[0]}, {i:data.ip[1]}];
             $scope.master_url = data.ip.join('.')+":8080";
-            $scope.slave_ip = data.slave_ip;
-            $scope.master_owner = data.master_owner;
+            if (data.slave_ip) {
+                $scope.slave_ip = data.slave_ip;
+                $scope.slave_owner = {"active":true};
+            }     
+            if (data.master_owner) {
+                 $scope.master_owner = true;
+                 $scope.master_ip = data.ext_ip;
+                 $scope.hdfs_ip = data.ext_ip;
+            }
+            if (data.got_hdfs) {
+                $scope.hdfs = {"active":true, "starting":false};
+            }    
             $scope.pysparknotebook = data.pysparknotebook;
         }
         else {
@@ -199,7 +208,11 @@ mainModule.controller('docController',function($scope,$http) {
 });
 
 mainModule.controller('uploadController', ['$scope','Upload', '$timeout', function ($scope, Upload, $timeout) {
-    $scope.upload = {"active":false};
+    if ($scope.hdfs.active) {
+        $scope.upload = {"active":true};
+    } else {
+        $scope.upload = {"active":false};   
+    }    
     
     $scope.$on('hdfsUp', function(event, args) {$scope.upload.active=true; $scope.$apply();});
     $scope.$on('hdfsDown', function(event, args) {$scope.upload.active=false; $scope.$apply();});
