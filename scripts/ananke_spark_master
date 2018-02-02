@@ -1,5 +1,5 @@
 #!/bin/bash
-export SPARK_HOME=/spark-2.1.0-bin-hadoop2.7
+export SPARK_HOME=/spark-2.2.1-bin-hadoop2.7
 sed -i "s/NAMENODE/$1/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 chown hdfs $HADOOP_HOME/etc/hadoop/core-site.xml 
 rm /home/hdfs/.ssh/id_rsa*
@@ -10,4 +10,4 @@ cp /home/hdfs/.ssh/id_rsa.pub /var/www/ananke/static/id_rsa.pub
 cp $HADOOP_HOME/etc/hadoop/core-site.xml /var/www/ananke/static/core-site.xml
 chmod a+r /var/www/ananke/static/id_rsa.pub
 sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/bin/hdfs namenode -format -nonInteractive -force
-/spark-2.1.0-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.master.Master --ip $1 --port 7077 --webui-port 8080
+/spark-2.2.1-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.master.Master --ip $1 --port 7077 --webui-port 8080

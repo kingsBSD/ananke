@@ -2,5 +2,5 @@
 export PYSPARK_PYTHON=/usr/bin/python3.5
 export PYSPARK_DRIVER_PYTHON=/usr/local/bin/jupyter
 cd /data
-/spark-2.1.0-bin-hadoop2.7/bin/pyspark  --master spark://$1:7077
+/spark-2.2.1-bin-hadoop2.7/bin/pyspark --master spark://$1:7077
 
