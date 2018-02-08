@@ -21,10 +21,6 @@ def get_ip(external=True):
             if ip:
                 return ip[0]
     return False
-    
-
-        
-    
 
 
 

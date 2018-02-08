@@ -168,7 +168,7 @@ def stop_master(request):
             slave_db.purge_slaves()
             result['okay'] = True
         else:
-            result['error'] = "No Mesos master is active."            
+            result['error'] = "No master is active."            
     else:
         result['error'] = "A notebook server is still active."
     return json.dumps(result)
@@ -195,6 +195,9 @@ def report_slave(request):
     result = {'okay':False}
 
     slave_ip = get_request_par(request,'ip')
+
+    if slave_ip == get_ip():
+        slave_ip = get_ip(external=False)
 
     if valid_ip(slave_ip):
         drop = get_request_par(request,'drop')
