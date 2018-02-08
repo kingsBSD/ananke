@@ -11,4 +11,5 @@ chown hdfs /home/hdfs/.ssh/authorized_keys
 chmod 700 /home/hdfs/.ssh
 chmod 600 home/hdfs/.ssh/authorized_keys
 runuser -l hdfs -c 'eval `ssh-agent -s` && ssh-add'
+service sshd restart
 /spark-2.2.1-bin-hadoop2.7/bin/spark-class org.apache.spark.deploy.worker.Worker -i $2 -p $3 spark://$1:7077
