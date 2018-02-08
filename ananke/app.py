@@ -80,7 +80,8 @@ def start_master(request):
     ip = get_ip()            
     if not got_cluster(ip):
         if not got_slave(ip):
-            zocket_send(msg=msg.STARTMASTER,ip=ip)
+            int_ip = get_ip(external=False)
+            zocket_send(msg=msg.STARTMASTER,ip=int_ip)
             slave_db.create_db().addCallback(post_purge)
             result = {'okay': True, 'ip':ip}
         else:
@@ -101,7 +102,8 @@ def start_slave(request):
         slave_ip = get_ip()
         if got_cluster(master_ip):
             if not got_slave(slave_ip):
-                zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=slave_ip)
+                int_ip = get_ip(external=False)
+                zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=int_ip)
                 result['okay'] = True
             else:
                 result['error'] = "This node is already a Spark slave."
