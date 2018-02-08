@@ -196,9 +196,6 @@ def report_slave(request):
 
     slave_ip = get_request_par(request,'ip')
 
-    if slave_ip == get_ip():
-        slave_ip = get_ip(external=False)
-
     if valid_ip(slave_ip):
         drop = get_request_par(request,'drop')
         if drop != 'true':
