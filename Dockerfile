@@ -70,6 +70,8 @@ RUN pip3 install twisted autobahn PyZMQ txZMQ klein requests bs4 treq
 RUN mkdir -p /data
 
 RUN sed -i s/Port\\s22/Port\ 8022/ etc/ssh/sshd_config
+RUN sed -i s/#ListenAddress\\s0.0.0.0/ListenAddress\ 0.0.0.0/ etc/ssh/sshd_config
+
 # http://linuxcommando.blogspot.co.uk/2008/10/how-to-disable-ssh-host-key-checking.html
 # https://www.symantec.com/connect/articles/ssh-host-key-protection
 RUN echo "    Port 8022" >> /etc/ssh/ssh_config && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
