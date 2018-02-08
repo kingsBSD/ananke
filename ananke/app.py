@@ -103,7 +103,7 @@ def start_slave(request):
         if got_cluster(master_ip):
             if not got_slave(slave_ip):
                 int_ip = get_ip(external=False)
-                zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=int_ip)
+                zocket_send(msg=msg.STARTSLAVE, master_ip=master_ip, slave_ip=int_ip, ext_ip=slave_ip)
                 result['okay'] = True
             else:
                 result['error'] = "This node is already a Spark slave."

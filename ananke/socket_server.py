@@ -101,12 +101,12 @@ class NotificationServerFactory(WebSocketServerFactory):
                 self.broadcast_local(res)
                 if okay:
                     self.master.confirm_started()
-                    slave_okay = yield self.start_slave(message['ip'],message['ip'])
+                    slave_okay = yield self.start_slave(message['ip'],message['ip'],message['ext_ip'])
             else:    
                 self.broadcast_local('start_master_failed')
                 
         if job == msg.STARTSLAVE:
-            okay = yield self.start_slave(message['master_ip'], message['slave_ip'])
+            okay = yield self.start_slave(message['master_ip'], message['slave_ip'], message['ext_ip'])
             if not okay:
                 self.broadcast_local('start_slave_failed')
                                     
@@ -194,13 +194,13 @@ class NotificationServerFactory(WebSocketServerFactory):
         returnValue((res,okay))
 
     @inlineCallbacks 
-    def start_slave(self,master_ip,slave_ip):
+    def start_slave(self,master_ip,slave_ip, ext_ip):
         if self.slave.start(master_ip, slave_ip):
-            res, okay = yield self.wait_slave(slave_ip)
+            res, okay = yield self.wait_slave(ext_ip)
             if okay:
                 self.slave.confirm_started()
             self.broadcast_local(res)
-            req = yield self.update_slaves(master_ip, slave_ip)
+            req = yield self.update_slaves(master_ip, ext_ip)
             returnValue(True)
         else:
             returnValue(False)
@@ -236,7 +236,9 @@ class NotificationServerFactory(WebSocketServerFactory):
 
     @inlineCallbacks 
     def wait_hdfs(self, ip, slave_count):
-        res, okay = yield self.are_we_there_yet(ip,got_hdfs,lambda x,ip: " ".join(["hdfs_active",ip]),"hdfs_failed","HDFS",max_tries=slave_count*50)
+        res, okay = yield self.are_we_there_ye
+        
+        t(ip,got_hdfs,lambda x,ip: " ".join(["hdfs_active",ip]),"hdfs_failed","HDFS",max_tries=slave_count*50)
         returnValue((res,okay))
 
     @inlineCallbacks
@@ -246,6 +248,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         if wait_for:
             debug_str = "Waiting for " + wait_for + "..."
             debug_done = "Found " + wait_for
+
             debug_fail = "Can't find " + wait_for
         else:
             debug_str = "Waiting..."
