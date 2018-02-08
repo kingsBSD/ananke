@@ -236,9 +236,7 @@ class NotificationServerFactory(WebSocketServerFactory):
 
     @inlineCallbacks 
     def wait_hdfs(self, ip, slave_count):
-        res, okay = yield self.are_we_there_ye
-        
-        t(ip,got_hdfs,lambda x,ip: " ".join(["hdfs_active",ip]),"hdfs_failed","HDFS",max_tries=slave_count*50)
+        res, okay = yield self.are_we_there_yet(ip,got_hdfs,lambda x,ip: " ".join(["hdfs_active",ip]),"hdfs_failed","HDFS",max_tries=slave_count*50)
         returnValue((res,okay))
 
     @inlineCallbacks
