@@ -33,7 +33,7 @@ def root(request):
     return File("./static/")
 
 @app.route('/api/getdocs')
-def all_the_docs(reques):
+def all_the_docs(request):
     return json.dumps({'allthedocs':get_docs()})
 
 @app.route('/api/status')
