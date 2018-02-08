@@ -4,6 +4,7 @@ mkdir -p /home/hdfs/.ssh
 chown hdfs /home/hdfs/.ssh
 rm /home/hdfs/.ssh/authorized_keys
 wget -O /home/hdfs/.ssh/authorized_keys http://$1:5000/id_rsa.pub
+echo -e 'from="*.*.*.*" $(cat /home/hdfs/.ssh/authorized_keys)' > /home/hdfs/.ssh/authorized_keys
 wget -O $HADOOP_HOME/etc/hadoop/core-site.xml http://$1:5000/core-site.xml 
 chown hdfs $HADOOP_HOME/etc/hadoop/core-site.xml 
 chown hdfs /home/hdfs/.ssh/authorized_keys
