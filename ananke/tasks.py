@@ -74,8 +74,8 @@ class SparkMaster(Task):
         Task.__init__(self)
         self.ip = False
 
-    def start(self,ip):
-        if Task.run(self,"/usr/local/bin/ananke_spark_master",[ip]):
+    def start(self,ip, ext_ip):
+        if Task.run(self,"/usr/local/bin/ananke_spark_master",[ip, ext_ip]):
             self.master_ip = ip
             return True
         else:

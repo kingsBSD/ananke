@@ -1,6 +1,6 @@
 #!/bin/bash
 export SPARK_HOME=/spark-2.2.1-bin-hadoop2.7
-sed -i "s/NAMENODE/$1/g" $HADOOP_HOME/etc/hadoop/core-site.xml
+sed -i "s/NAMENODE/$2/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 chown hdfs $HADOOP_HOME/etc/hadoop/core-site.xml 
 rm /home/hdfs/.ssh/id_rsa*
 mkdir -p /home/hdfs/.ssh

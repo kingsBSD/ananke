@@ -96,7 +96,7 @@ class NotificationServerFactory(WebSocketServerFactory):
         job = message.get('msg',False)
 
         if job == msg.STARTMASTER:
-            if self.master.start(message['ip']):
+            if self.master.start(message['ip'], message['ext_ip']):
                 res, okay = yield self.wait_master(message['ip'])
                 self.broadcast_local(res)
                 if okay:

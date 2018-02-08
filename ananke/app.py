@@ -81,7 +81,7 @@ def start_master(request):
     if not got_cluster(ip):
         if not got_slave(ip):
             int_ip = get_ip(external=False)
-            zocket_send(msg=msg.STARTMASTER,ip=int_ip)
+            zocket_send(msg=msg.STARTMASTER,ip=int_ip,ext_ip=ip)
             slave_db.create_db().addCallback(post_purge)
             result = {'okay': True, 'ip':ip}
         else:
