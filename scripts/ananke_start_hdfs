@@ -1,4 +1,5 @@
 #!/bin/bash
 service ssh restart
-chown hdfs $HADOOP_HOME/etc/hadoop/core-site.xml 
+chown hdfs $HADOOP_HOME/etc/hadoop/*
+sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/bin/hdfs namenode -format -nonInteractive
 sudo -u hdfs HADOOP_HOME=$HADOOP_HOME $HADOOP_HOME/sbin/start-dfs.sh
