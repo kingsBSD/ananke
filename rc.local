@@ -1,0 +1,6 @@
+CONTAINER=$(docker ps | grep -o ananke$)
+if [ $CONTAINER = "ananke" ]
+then
+        docker kill ananke
+fi
+docker run -d --rm --name ananke --net=host --pid=host -e TINI_SUBREAPER=true kingsbsd/ananke
