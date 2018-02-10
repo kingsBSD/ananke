@@ -29,4 +29,27 @@
         <name>fs.default.name</name>
         <value>hdfs://0.0.0.0:8020</value>
     </property>
+
+<!-- https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-hdfs/HdfsMultihoming.html -->
+    
+    <property>
+        <name>dfs.namenode.rpc-bind-host</name>
+        <value>0.0.0.0</value>
+    </property>    
+    
+    <property>
+        <name>dfs.namenode.servicerpc-bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
+    
+    <property>
+        <name>dfs.namenode.http-bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
+    
+    <property>
+        <name>dfs.namenode.https-bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
+        
 </configuration>
